@@ -50,6 +50,7 @@ async function initRatings() {
   if (!$el) return;
 
   try {
+    // Keep the full list here; club-specific views can use /ratings/${encodeURIComponent(club)}.
     const response = await fetch(`${API_URL}/ratings`);
     if (!response.ok) throw new Error(`Failed to load ratings: ${response.status}`);
     const ratings = await response.json();

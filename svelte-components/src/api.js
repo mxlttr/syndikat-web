@@ -63,7 +63,6 @@ export function streamProducts(query, callbacks = {}) {
 }
 
 export async function fetchNewestProducts() {
-  const data = [];
   try {
     const response = await fetch(`${API_URL}/products/feed`, {
       headers: {
@@ -73,13 +72,29 @@ export async function fetchNewestProducts() {
     });
     if (!response.ok) {
       console.error(`Fetch error: ${response.status} ${response.statusText}`);
-      return data;
+      return [];
     }
-    const result = await response.json();
-    data.push(...result);
-    return data;
+    return await response.json();
   } catch (err) {
     console.error("Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource.", err);
     return data;
   }
+}
+
+export async function fetchRatings({ signal } = {}) {
+  const response = await fetch(`${API_URL}/ratings`, { signal });
+  if (!response.ok) {
+    throw new Error(`Failed to load ratings: ${response.status}`);
+  }
+  const players = await response.json();
+  if (!Array.isArray(players)) {
+    throw new Error('Ratings response is not an array');
+  }
+  return players;
+}
+
+export async function fetchPlayer(id, { signal } = {}) {
+  const response = await fetch(`${API_URL}/players/${encodeURIComponent(id)}`, { signal });
+  if (!response.ok) throw new Error(`Failed to load player: ${response.status}`);
+  return response.json();
 }
