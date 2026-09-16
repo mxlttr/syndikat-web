@@ -119,11 +119,11 @@
   async function showPlayer(player) {
     const id = player.gtNumber || new URL(player.link).searchParams.get("gtn");
     if (!id) return;
-    selectedPlayer = { name: `${player.firstName} ${player.lastName}`, club: player.club };
+    selectedPlayer = { name: `${player.firstName} ${player.lastName}`, club: player.club, divisionRank: player.divisionRank };
     playerLoading = true;
     playerError = false;
     try {
-      selectedPlayer = { ...(await fetchPlayer(id)), rating: player.rating };
+      selectedPlayer = { ...(await fetchPlayer(id)), rating: player.rating, divisionRank: player.divisionRank };
     } catch (err) {
       playerError = true;
     } finally {
@@ -336,6 +336,7 @@
           <div><strong>{selectedPlayer.tournaments?.length || 0}</strong><span>Turniere</span></div>
           <div><strong>{selectedPlayer.tournaments?.reduce((sum, item) => sum + (item.rounds?.length || 0), 0) || 0}</strong><span>Runden</span></div>
           <div><strong>{formatRating(selectedPlayer.rating)}</strong><span>Aktuelles Rating</span></div>
+          <div><strong>{selectedPlayer.divisionRank}</strong><span>Rang in Division</span></div>
           <div><strong>{selectedPlayer.gtNumber}</strong><span>GT-Nummer</span></div>
         </div>
         <h3>Turnierverlauf</h3>
@@ -383,7 +384,7 @@
   .rating-modal__club, .rating-modal__muted { margin: 0; color: rgb(0 0 0 / 60%); }
   .rating-modal__content { min-height: 34rem; }
   .rating-modal__content--state { display: flex; min-height: 34rem; align-items: center; justify-content: center; }
-  .rating-modal__stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; margin: 0 0 1.5rem; }
+  .rating-modal__stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: .75rem; margin: 0 0 1.5rem; }
   .rating-modal__stats div { padding: .85rem; border-radius: .65rem; background: rgb(0 0 0 / 5%); }
   .rating-modal__stats strong, .rating-modal__stats span { display: block; }
   .rating-modal__stats strong { font-size: 1.25rem; }
