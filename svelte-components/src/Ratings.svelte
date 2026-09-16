@@ -13,14 +13,37 @@
   let selectedPlayer = null;
   let playerLoading = false;
   let playerError = false;
+  let noResultsEventKey = "";
+
+  function trackEvent(eventName, data = {}) {
+    if (typeof window !== "undefined" && window.umami) {
+      window.umami.track(eventName, data);
+    }
+  }
+
+  function trackRatingsSearch() {
+    trackEvent("ratings_search", { query: search });
+  }
+
+  function trackRatingsFilter(type, value) {
+    trackEvent("ratings_filter", { filter: type, value });
+  }
+
+  function trackExternalLink(destination) {
+    trackEvent("ratings_external_link_click", { destination });
+  }
   onMount(() => {
     const controller = new AbortController();
     fetchRatings({ signal: controller.signal })
       .then((data) => {
         players = data;
+        trackEvent("ratings_loaded", { resultCount: data.length });
       })
       .catch((err) => {
-        if (err.name !== "AbortError") error = true;
+        if (err.name !== "AbortError") {
+          error = true;
+          trackEvent("ratings_load_error");
+        }
       })
       .finally(() => {
         loading = false;
@@ -45,6 +68,14 @@
         playerClub.toLocaleLowerCase("de").includes(query))
     );
   });
+
+  $: if (!loading && !error && visiblePlayers.length === 0) {
+    const key = `${search}|${division}|${club}`;
+    if (key !== noResultsEventKey) {
+      noResultsEventKey = key;
+      trackEvent("ratings_no_results", { query: search, division, club });
+    }
+  }
 
   function searchPlayers() {
     club = "all";
@@ -120,6 +151,7 @@
       placeholder="Spieler/Verein suchen..."
       bind:value={search}
       on:input={searchPlayers}
+      on:change={trackRatingsSearch}
       disabled={loading || error}
     />
   </div>
@@ -130,6 +162,7 @@
       bind:value={division}
       on:change={() => {
         search = "";
+        trackRatingsFilter("division", division);
       }}
       disabled={loading || error}
     >
@@ -142,6 +175,7 @@
       bind:value={club}
       on:change={() => {
         search = "";
+        trackRatingsFilter("club", club);
       }}
       disabled={loading || error}
     >
@@ -226,7 +260,7 @@
                   </span>
                 {/if}
                 <div class="ranking-name-wrapper">
-                  <a href={player.link} on:click|preventDefault={() => showPlayer(player)}>{player.firstName} {player.lastName}</a>
+                  <a href={player.link} on:click|preventDefault={() => { trackEvent("ratings_player_open", { gtNumber: player.gtNumber, name: `${player.firstName} ${player.lastName}` }); showPlayer(player); }}>{player.firstName} {player.lastName}</a>
                   <div class="ranking-club">{player.club}</div>
                 </div>
               </div>
@@ -310,15 +344,15 @@
           {#each selectedPlayer.tournaments as tournament}
             <article class="rating-modal__tournament">
               <div class="rating-modal__tournament-heading">
-                <strong><a href={tournament.tournamentId ? `https://rating.discgolf.de/turnier.php?turnier=${tournament.tournamentId}` : tournament.pdgaEventId ? `https://www.pdga.com/tour/event/${tournament.pdgaEventId}` : "#"} target="_blank" rel="noopener noreferrer">{tournament.name}</a></strong>
+                <strong><a href={tournament.tournamentId ? `https://rating.discgolf.de/turnier.php?turnier=${tournament.tournamentId}` : tournament.pdgaEventId ? `https://www.pdga.com/tour/event/${tournament.pdgaEventId}` : "#"} target="_blank" rel="noopener noreferrer" on:click={() => trackExternalLink(tournament.tournamentId ? "gt" : "pdga")}>{tournament.name}</a></strong>
                 <span>{formatTournamentDates(tournament)}</span>
               </div>
               <div class="rating-modal__meta">
                 {#if tournament.series && tournament.series !== "Einzelturnier"}<span class="rating-modal__muted">{tournament.series}</span>{/if}
                 {#if tournament.tournamentId || tournament.pdgaEventId}
                   <div class="rating-modal__ids">
-                    {#if tournament.tournamentId}<a href={`https://rating.discgolf.de/turnier.php?turnier=${tournament.tournamentId}`} target="_blank" rel="noopener noreferrer">discgolf.de</a>{/if}
-                    {#if tournament.pdgaEventId}<a href={`https://www.pdga.com/tour/event/${tournament.pdgaEventId}`} target="_blank" rel="noopener noreferrer">PDGA</a>{/if}
+                    {#if tournament.tournamentId}<a href={`https://rating.discgolf.de/turnier.php?turnier=${tournament.tournamentId}`} target="_blank" rel="noopener noreferrer" on:click={() => trackExternalLink("gt")}>discgolf.de</a>{/if}
+                    {#if tournament.pdgaEventId}<a href={`https://www.pdga.com/tour/event/${tournament.pdgaEventId}`} target="_blank" rel="noopener noreferrer" on:click={() => trackExternalLink("pdga")}>PDGA</a>{/if}
                   </div>
                 {/if}
               </div>
