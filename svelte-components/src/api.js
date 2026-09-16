@@ -77,7 +77,7 @@ export async function fetchNewestProducts() {
     return await response.json();
   } catch (err) {
     console.error("Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource.", err);
-    return data;
+    return [];
   }
 }
 

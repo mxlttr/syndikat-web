@@ -363,7 +363,7 @@
   .rating-modal__rounds th { color: var(--text-alt-color, #716f8a); font-size: .7rem; font-weight: 600; text-align: left; text-transform: uppercase; }
   .rating-modal__rounds th, .rating-modal__rounds td { padding: .35rem .5rem .35rem 0; }
   .rating-modal__rounds tr + tr { border-top: 1px solid var(--border-color, #f3f7ff); }
-  .round-trend { vertical-align: middle; margin-left: .2rem; }
+  :global(.round-trend) { vertical-align: middle; margin-left: .2rem; }
   .rating-modal__ids { display: flex; justify-content: flex-end; gap: .75rem; margin-left: auto; font-size: .8rem; }
   .rating-modal__ids a { color: var(--link-color, #1e2740); text-decoration: none; }
   :global([dark]) .rating-modal__club,
