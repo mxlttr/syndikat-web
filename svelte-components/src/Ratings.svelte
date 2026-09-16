@@ -14,6 +14,17 @@
   let playerLoading = false;
   let playerError = false;
   let noResultsEventKey = "";
+  let ratingsController;
+  const pageSize = 50;
+  let currentPage = 1;
+  let totalPlayers = 0;
+  let divisions = [];
+  let searchTimer;
+  const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 
   function trackEvent(eventName, data = {}) {
     if (typeof window !== "undefined" && window.umami) {
@@ -32,12 +43,29 @@
   function trackExternalLink(destination) {
     trackEvent("ratings_external_link_click", { destination });
   }
-  onMount(() => {
+  async function loadRatings(requestedPage = currentPage) {
+    ratingsController?.abort();
     const controller = new AbortController();
-    fetchRatings({ signal: controller.signal })
-      .then((data) => {
-        players = data;
-        trackEvent("ratings_loaded", { resultCount: data.length });
+    ratingsController = controller;
+    loading = true;
+    error = false;
+    fetchRatings({
+      signal: controller.signal,
+      club: club === "syndikat-only" ? "Syndikat" : club === "cologne-only" ? "Köln" : "",
+      division,
+      search,
+      page: requestedPage,
+      pageSize,
+    })
+      .then((result) => {
+        players = result.items.map((player) => ({
+          ...player,
+          lastRoundLabel: formatDate(player.lastRound),
+        }));
+        totalPlayers = result.total;
+        divisions = result.divisions;
+        currentPage = requestedPage;
+        trackEvent("ratings_loaded", { resultCount: result.total });
       })
       .catch((err) => {
         if (err.name !== "AbortError") {
@@ -46,30 +74,18 @@
         }
       })
       .finally(() => {
-        loading = false;
+        if (!controller.signal.aborted && ratingsController === controller) loading = false;
       });
-    return () => controller.abort();
+  }
+
+  onMount(() => {
+    loadRatings();
+    return () => ratingsController?.abort();
   });
 
-  $: divisions = [...new Set(players.map((player) => player.division))].sort(
-    (a, b) => a.localeCompare(b, "de", { numeric: true }),
-  );
-  $: query = search.toLocaleLowerCase("de");
-  $: visiblePlayers = players.filter((player) => {
-    const playerClub = player.club || "";
-    return (
-      (club === "all" ||
-        playerClub.includes("Syndikat") ||
-        (club === "cologne-only" && playerClub.includes("Köln"))) &&
-      (division === "all" || player.division === division) &&
-      (`${player.firstName} ${player.lastName}`
-        .toLocaleLowerCase("de")
-        .includes(query) ||
-        playerClub.toLocaleLowerCase("de").includes(query))
-    );
-  });
+  $: totalPages = Math.max(1, Math.ceil(totalPlayers / pageSize));
 
-  $: if (!loading && !error && visiblePlayers.length === 0) {
+  $: if (!loading && !error && totalPlayers === 0) {
     const key = `${search}|${division}|${club}`;
     if (key !== noResultsEventKey) {
       noResultsEventKey = key;
@@ -78,8 +94,12 @@
   }
 
   function searchPlayers() {
-    club = "all";
-    division = "all";
+    if (club !== "all") {
+      club = "all";
+      division = "all";
+    }
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadRatings(1), 250);
   }
 
   function avatarColor(player) {
@@ -97,13 +117,7 @@
   function formatDate(value) {
     if (!value) return "–";
     const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? "–"
-      : date.toLocaleDateString("de-DE", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        });
+    return Number.isNaN(date.getTime()) ? "–" : dateFormatter.format(date);
   }
 
   function formatRating(value) {
@@ -152,7 +166,7 @@
       bind:value={search}
       on:input={searchPlayers}
       on:change={trackRatingsSearch}
-      disabled={loading || error}
+      disabled={error || (loading && players.length === 0)}
     />
   </div>
   <div class="rating-filters">
@@ -163,6 +177,7 @@
       on:change={() => {
         search = "";
         trackRatingsFilter("division", division);
+        loadRatings(1);
       }}
       disabled={loading || error}
     >
@@ -176,6 +191,7 @@
       on:change={() => {
         search = "";
         trackRatingsFilter("club", club);
+        loadRatings(1);
       }}
       disabled={loading || error}
     >
@@ -203,7 +219,7 @@
       </tr>
     </thead>
     <tbody>
-      {#if loading}
+      {#if loading && players.length === 0}
         {#each Array(7) as _, index}
           <tr
             class="row-skeleton"
@@ -229,7 +245,7 @@
             <td>▮▮.▮▮.▮▮▮▮</td>
           </tr>
         {/each}
-      {:else if error}
+      {:else if error && players.length === 0}
         <tr
           ><td class="ratings-error" colspan="7" role="alert"
             >Ratings konnten gerade nicht geladen werden. Bitte versuche es
@@ -237,9 +253,12 @@
           ></tr
         >
       {:else}
-        {#each visiblePlayers as player, index}
+        {#if error}
+          <tr><td class="ratings-error" colspan="7" role="alert">Die Aktualisierung konnte nicht geladen werden. Die zuletzt geladenen Ratings werden angezeigt.</td></tr>
+        {/if}
+        {#each players as player, index (player.gtNumber || player.link)}
           <tr data-club={player.club}>
-            <td>{index + 1}</td>
+            <td>{(currentPage - 1) * pageSize + index + 1}</td>
             <td>
               <div class="name-cell">
                 {#if player.image}
@@ -297,7 +316,7 @@
               {/if}
             </td>
             <td>{player.dmRounds}/{player.roundCount}</td>
-            <td>{formatDate(player.lastRound)}</td>
+            <td>{player.lastRoundLabel}</td>
           </tr>
         {:else}
           <tr
@@ -310,6 +329,14 @@
     </tbody>
   </table>
 </div>
+
+{#if !loading && !error && totalPages > 1}
+  <nav class="ratings-pagination" aria-label="Ratingseiten">
+    <button type="button" class="button button--text" on:click={() => loadRatings(currentPage - 1)} disabled={loading || currentPage === 1}>← Zurück</button>
+    <span>Seite {currentPage} von {totalPages} · {totalPlayers} Spieler*innen</span>
+    <button type="button" class="button button--text" on:click={() => loadRatings(currentPage + 1)} disabled={loading || currentPage === totalPages}>Weiter →</button>
+  </nav>
+{/if}
 
 {#if selectedPlayer}
   <div class="rating-modal-backdrop" role="presentation" on:click={closePlayer}>
@@ -398,6 +425,7 @@
   .rating-modal__rounds th { color: var(--text-alt-color, #716f8a); font-size: .7rem; font-weight: 600; text-align: left; text-transform: uppercase; }
   .rating-modal__rounds th, .rating-modal__rounds td { padding: .35rem .5rem .35rem 0; }
   .rating-modal__rounds tr + tr { border-top: 1px solid var(--border-color, #f3f7ff); }
+  .ratings-pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1rem 0 2rem; font-size: .85rem; }
   :global(.round-trend) { vertical-align: middle; margin-left: .2rem; }
   .rating-modal__ids { display: flex; justify-content: flex-end; gap: .75rem; margin-left: auto; font-size: .8rem; }
   .rating-modal__ids a { color: var(--link-color, #1e2740); text-decoration: none; }

@@ -81,16 +81,20 @@ export async function fetchNewestProducts() {
   }
 }
 
-export async function fetchRatings({ signal } = {}) {
-  const response = await fetch(`${API_URL}/ratings`, { signal });
+export async function fetchRatings({ signal, club = "", division = "", search = "", page = 1, pageSize = 50 } = {}) {
+  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  if (club) params.set("club", club);
+  if (division && division !== "all") params.set("division", division);
+  if (search) params.set("search", search);
+  const response = await fetch(`${API_URL}/ratings?${params}`, { signal });
   if (!response.ok) {
     throw new Error(`Failed to load ratings: ${response.status}`);
   }
-  const players = await response.json();
-  if (!Array.isArray(players)) {
-    throw new Error('Ratings response is not an array');
+  const result = await response.json();
+  if (!result || !Array.isArray(result.items)) {
+    throw new Error('Ratings response has an invalid shape');
   }
-  return players;
+  return result;
 }
 
 export async function fetchPlayer(id, { signal } = {}) {
