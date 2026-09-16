@@ -44,6 +44,7 @@
   $: progress = totalStores ? parseInt((shopCount / totalStores) * 100) : 0;
 
   let searchedQuery = "";
+  let unsubscribeQuerystring;
 
   let searchInputElement;
 
@@ -230,11 +231,17 @@
   }
 
   onMount(async () => {
+    unsubscribeQuerystring = querystring.subscribe((value) => {
+      const nextQuery = new URLSearchParams(value).get("q") || "";
+      if (nextQuery.trim().toLowerCase() === searchedQuery) return;
+
+      query = nextQuery;
+      getProducts();
+    });
+
     const newest = (await fetchNewestProducts()).slice(0, 6);
     newProducts.set(newest);
 
-    query = new URLSearchParams($querystring).get("q") || "";
-    await getProducts();
     // discs are pulled from https://discit-api.fly.dev/disc
     discs = await fetch("/assets/discs.json").then((res) => res.json());
 
@@ -255,6 +262,7 @@
   });
 
   onDestroy(() => {
+    unsubscribeQuerystring?.();
     closeActiveSource();
   });
 </script>
