@@ -1,5 +1,6 @@
 <script>
-  import { shops } from "./shops";
+  import Icon from "./Icon.svelte";
+  import { shops } from "./shopData.js";
   import tippy from "tippy.js";
 
   function tooltip(node, params) {
@@ -31,17 +32,28 @@
   export let product;
   export let wishlist;
 
-  $: productUrl = product?.url ? new URL(product.url) : null;
-  $: cleanProductUrl = productUrl ? productUrl.origin + productUrl.pathname : "";
+  const parseProductUrl = (url) => {
+    if (!url) return null;
+    try {
+      return new URL(url);
+    } catch {
+      return null;
+    }
+  };
+
+  $: productUrl = parseProductUrl(product?.url);
+  $: cleanProductUrl = productUrl
+    ? productUrl.origin + productUrl.pathname
+    : "";
+  $: productHref = cleanProductUrl ? `${cleanProductUrl}?ref=syndikat.golf` : null;
   let isWishlisted = false;
   $: {
     wishlist.subscribe((products) => {
-      isWishlisted = products.some((wishlistProduct) =>
-        wishlistProduct.url.includes(cleanProductUrl),
+      isWishlisted = Boolean(cleanProductUrl) && products.some((wishlistProduct) =>
+        wishlistProduct.url?.includes(cleanProductUrl),
       );
     });
   }
-
 
   $: shop = shops.find((shop) => shop.handle === product?.store);
   const stockStatusLabels = {
@@ -54,29 +66,26 @@
     style: "currency",
     currency: "EUR",
   });
+  $: productPrice = typeof product?.price === "number"
+    ? EURO.format(product.price / 100)
+    : "Preis unbekannt";
+
+  const trackEvent = (eventName, props) => {
+    if (window.umami) window.umami.track(eventName, props);
+  };
 
   const trackProduct = (product) => {
-    window.plausible =
-      window.plausible ||
-      function () {
-        (window.plausible.q = window.plausible.q || []).push(arguments);
-      };
-    window.plausible("product-click", {
-      props: {
-        product: product.title,
-        store: product.store,
-        price: product.price / 100,
-        currency: "EUR",
-        url: product.url,
-      },
+    if (!productHref) return;
+    trackEvent("product_click", {
+      product: product.title,
+      store: product.store,
+      price: product.price / 100,
+      currency: "EUR",
+      url: product.url,
     });
   };
 
-  const toggleWishlist = (e) => {
-    const icon = e.target.closest(".ion");
-    icon.classList.toggle("ion-md-heart");
-    icon.classList.toggle("ion-md-heart-empty");
-
+  const toggleWishlist = () => {
     wishlist.update((items) => {
       if (isWishlisted) {
         return items.filter(
@@ -94,7 +103,7 @@
   <div class="article__inner">
     <div class="article__head">
       <a
-        href={`${cleanProductUrl}?ref=syndikat.golf`}
+        href={productHref}
         rel="noopener noreferrer"
         target="_blank"
         class="article__image"
@@ -128,7 +137,7 @@
           zIndex: 1,
         }}
       >
-        <i class={`ion ion-md-heart${isWishlisted ? "" : "-empty"}`}></i>
+        <Icon name="heart" filled={isWishlisted} />
       </button>
       {#if shop && shop.shipping && shop.shipping.amount}
         <span
@@ -140,14 +149,14 @@
             zIndex: 1,
           }}
         >
-          <i class="ion ion-md-information-circle-outline"></i>
+          <Icon name="info" />
         </span>
       {/if}
     </div>
     <div class="article__content">
       <h2 class="article__title">
         <a
-          href={`${cleanProductUrl}?ref=syndikat.golf`}
+          href={productHref}
           rel="noopener noreferrer"
           target="_blank"
           on:click={trackProduct(product)}>{product.title}</a
@@ -157,7 +166,7 @@
         <span class={`inventory status-${product.stockStatus}`}
           >{stockStatusLabels[product.stockStatus]}</span
         >
-        <strong>{EURO.format(product.price / 100)}</strong>
+        <strong>{productPrice}</strong>
         <img
           src={`/assets/images/logos/${product.store}-light.png`}
           class="store-logo hide-dark"

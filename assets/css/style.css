@@ -2617,6 +2617,15 @@ button.button--text {
   max-height: 50px
 }
 
+.lucide {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  flex-shrink: 0;
+  stroke-width: var(--lucide-stroke-width, 2);
+}
+
 .main-nav {
   margin-left: auto
 }
@@ -2627,6 +2636,11 @@ button.button--text {
 
 @media only screen and (max-width: 1024px) {
   .main-nav {
+    --panel-open-dur: 400ms;
+    --panel-close-dur: 350ms;
+    --panel-translate-y: 80px;
+    --panel-blur: 2px;
+    --panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
     position: fixed;
     top: 0;
     left: 0;
@@ -2635,13 +2649,21 @@ button.button--text {
     z-index: 2000;
     opacity: 0;
     visibility: hidden;
-    background-color: var(--background-color)
+    pointer-events: none;
+    background-color: var(--background-color);
+    overflow: hidden;
+    transition:
+      opacity var(--panel-close-dur) var(--panel-ease),
+      visibility 0s linear var(--panel-close-dur)
   }
 
   .main-nav.is-open {
     opacity: 1;
     visibility: visible;
-    transition: all .25s ease
+    pointer-events: auto;
+    transition:
+      opacity var(--panel-open-dur) var(--panel-ease),
+      visibility 0s linear 0s
   }
 
   .main-nav .nav__list {
@@ -2683,17 +2705,19 @@ button.button--text {
   height: 36px;
   font-size: 24px;
   line-height: 1;
+  border: 0;
   border-radius: 50%;
   color: var(--heading-font-color);
+  font-family: inherit;
   background: var(--background-alt-color);
   cursor: pointer
 }
 
-.main-nav__box .nav__icon-close:hover .ion-md-close {
+.main-nav__box .nav__icon-close:hover svg {
   transform: rotate(90deg)
 }
 
-.main-nav__box .nav__icon-close .ion-md-close {
+.main-nav__box .nav__icon-close svg {
   transition: all 0.35s
 }
 
@@ -2702,6 +2726,29 @@ button.button--text {
 }
 
 @media only screen and (max-width: 1024px) {
+  .main-nav .t-panel-slide {
+    transform: translateY(var(--panel-translate-y));
+    opacity: 0;
+    filter: blur(var(--panel-blur));
+    pointer-events: none;
+    transition:
+      transform var(--panel-close-dur) var(--panel-ease),
+      opacity var(--panel-close-dur) var(--panel-ease),
+      filter var(--panel-close-dur) var(--panel-ease);
+    will-change: transform, opacity, filter
+  }
+
+  .main-nav .t-panel-slide[data-open="true"] {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+    pointer-events: auto;
+    transition:
+      transform var(--panel-open-dur) var(--panel-ease),
+      opacity var(--panel-open-dur) var(--panel-ease),
+      filter var(--panel-open-dur) var(--panel-ease)
+  }
+
   .main-nav__box {
     display: block;
     align-items: center;
@@ -2717,7 +2764,7 @@ button.button--text {
     display: flex;
     position: absolute;
     top: 40px;
-    right: 40px
+    right: 0
   }
 
   .main-nav__box .nav__title {
@@ -2733,6 +2780,14 @@ button.button--text {
 @media only screen and (max-width: 768px) {
   .main-nav__box {
     padding-top: 100px
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-nav,
+  .main-nav .t-panel-slide,
+  .toggle-theme .t-icon {
+    transition: none !important
   }
 }
 
@@ -2765,78 +2820,105 @@ button.button--text {
 }
 
 .nav-button {
+  display: flex;
+  align-items: center;
   font-size: 21px;
   color: var(--link-color);
   cursor: pointer
 }
 
-.nav-button .icon__menu {
+.nav-button .nav__icon.icon__menu {
   display: none;
 }
 
 .nav-button .nav__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 6px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nav-button .nav__icon svg {
+  display: block;
+  width: 1em;
+  height: 1em;
 }
 
 .nav-button .icon__menu,
-.nav-button .icon__instagram,
 .nav-button .icon__search {
   transition: color .25s ease
 }
 
 .nav-button .icon__menu:hover,
-.nav-button .icon__instagram:hover,
 .nav-button .icon__search:hover {
   color: var(--brand-color)
 }
 
 @media only screen and (max-width: 1024px) {
   .nav-button {
-    display: flex;
-    align-items: center;
     margin-left: auto;
     font-size: 24px
   }
 
-  .nav-button .icon__menu {
-    display: block
+  .nav-button .nav__icon.icon__menu {
+    display: inline-flex
   }
 }
 
 .nav__icon.toggle-theme {
-  line-height: 1;
+  --icon-swap-dur: 200ms;
+  --icon-swap-blur: 2px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: ease-in-out;
+  position: relative;
+  display: inline-grid;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 1
 }
 
-.toggle-sun,
-.toggle-moon {
+.nav__icon.toggle-theme .t-icon {
+  grid-area: 1 / 1;
   font-size: 21px;
-  transition: color .25s ease;
-  color: var(--heading-font-color)
+  color: var(--heading-font-color);
+  transition:
+    opacity var(--icon-swap-dur) var(--icon-swap-ease),
+    filter var(--icon-swap-dur) var(--icon-swap-ease),
+    transform var(--icon-swap-dur) var(--icon-swap-ease),
+    color .25s ease;
+  will-change: opacity, filter, transform
 }
 
-.toggle-sun:hover,
-.toggle-moon:hover {
+.nav__icon.toggle-theme:hover .t-icon {
   color: var(--brand-color)
 }
 
 @media only screen and (max-width: 1024px) {
-
-  .toggle-sun,
-  .toggle-moon {
+  .nav__icon.toggle-theme .t-icon {
     font-size: 24px;
   }
 }
 
-.toggle-sun {
-  display: none
+.toggle-theme .toggle-moon,
+[dark] .toggle-theme .toggle-sun {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1)
 }
 
-[dark] .toggle-sun {
-  display: inline-block
-}
-
-[dark] .toggle-moon {
-  display: none
+.toggle-theme .toggle-sun,
+[dark] .toggle-theme .toggle-moon {
+  opacity: 0;
+  filter: blur(var(--icon-swap-blur));
+  transform: scale(var(--icon-swap-start-scale))
 }
 
 .hide-light {
@@ -2912,8 +2994,11 @@ button.button--text {
   height: 32px;
   font-size: 24px;
   line-height: 1;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   color: var(--heading-font-color);
+  font-family: inherit;
   cursor: pointer;
   will-change: transform;
   transition: all .25s;
@@ -2924,8 +3009,8 @@ button.button--text {
   transform: translateY(-50%) rotate(90deg)
 }
 
-.search__group .search__close .ion-md-close {
-  vertical-align: middle
+.search__group .search__close .lucide {
+  display: block
 }
 
 .search__group .search__text {
@@ -2953,6 +3038,44 @@ button.button--text {
 
 .search__group .search__text::-ms-clear {
   display: none
+}
+
+.supported-shops {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem
+}
+
+.supported-shop {
+  filter: brightness(0);
+  opacity: .7;
+  transition: all .2s ease
+}
+
+[dark] .supported-shop {
+  filter: brightness(0) invert(1)
+}
+
+@media (hover: hover) {
+  .supported-shop:hover {
+    filter: invert(0);
+    opacity: 1
+  }
+}
+
+.supported-shop a {
+  border-bottom: 0 !important;
+  display: block;
+  padding: 1rem
+}
+
+.supported-shop img {
+  border-radius: 0;
+  height: 32px;
+  width: 100px;
+  object-fit: contain
 }
 
 .search-results-list .no-results {
@@ -3177,9 +3300,15 @@ button.button--text {
 .social .social__link {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 4px;
   font-size: 20px;
   color: var(--heading-font-color)
+}
+
+.social .social__link .lucide {
+  color: currentColor;
+  stroke: currentColor;
 }
 
 .social .social__link:hover {
@@ -3233,11 +3362,13 @@ button.button--text {
 }
 
 .top {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 36px;
   height: 36px;
   font-size: 20px;
-  line-height: 36px;
-  text-align: center;
+  line-height: 1;
   border-radius: 8px;
   color: var(--heading-font-color);
   background-color: var(--background-alt-color);
@@ -3528,7 +3659,7 @@ button.button--text {
   padding-bottom: 62%;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--background-alt-color);
+  background: transparent;
   transition: none
 }
 
@@ -3834,7 +3965,7 @@ button.button--text {
   min-height: 280px;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--background-alt-color)
+  background: transparent
 }
 
 .post-image img,
@@ -4069,7 +4200,11 @@ button.button--text {
   max-width: 1149px;
 }
 
-.post a:not(.button):not([role="button"]),
+.post a:not(.button):not([role="button"]) {
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color)
+}
+
 .page a:not(.button):not([role="button"]) {
   font-weight: 500;
   border-bottom: 1px solid var(--border-color)
@@ -4147,7 +4282,8 @@ button.button--text {
   background: var(--background-alt-color)
 }
 
-.post__share .share__link i {
+.post__share .share__link i,
+.post__share .share__link .lucide {
   transition: transform .25s;
   will-change: transform
 }
@@ -4156,7 +4292,8 @@ button.button--text {
   color: var(--heading-font-color)
 }
 
-.post__share .share__link:hover i {
+.post__share .share__link:hover i,
+.post__share .share__link:hover .lucide {
   transform: scale(1.1)
 }
 
@@ -4902,7 +5039,7 @@ button.button--text {
 
 .popup-badge {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 400;
   padding: 2px 6px;
   background: #fca5a5;
   border-radius: 3px;
@@ -5042,6 +5179,10 @@ button.button--text {
 #ratings th:first-of-type,
 #ratings td:first-of-type {
   text-align: right;
+}
+
+#ratings td.ratings-error {
+  text-align: left;
 }
 
 #ratings tr {
@@ -5306,7 +5447,7 @@ button.button--text {
 
 .awesomplete .disc-category {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-color);
   text-transform: uppercase;
   background-color: var(--background-color);
@@ -5320,7 +5461,7 @@ button.button--text {
   grid-template-columns: repeat(4, auto);
   gap: 8px;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-color);
   margin-left: 8px;
 }
@@ -5344,6 +5485,35 @@ button.button--text {
   background-color: var(--background-alt-color);
   color: var(--text-alt-color);
 }
+
+table.on-tour td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.on-tour-wrapper {
+  margin-bottom: 32px;
+}
+
+.on-tour-status {
+  margin-bottom: 16px;
+}
+
+/* Week dividers shared by the events and tournament overview tables. */
+.tournaments-table tbody tr.tournaments-table__week,
+.tournaments-table tbody tr.tournaments-table__week:hover {
+  background: rgba(128, 128, 128, 0.12);
+  cursor: default;
+}
+
+.tournaments-table__week th {
+  padding: 12px 10px;
+  border: 0;
+  border-top: 2px solid var(--brand-color);
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 
 .section-project-proposal {
   padding: 72px 0 128px;

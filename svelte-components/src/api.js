@@ -63,7 +63,6 @@ export function streamProducts(query, callbacks = {}) {
 }
 
 export async function fetchNewestProducts() {
-  const data = [];
   try {
     const response = await fetch(`${API_URL}/products/feed`, {
       headers: {
@@ -73,13 +72,33 @@ export async function fetchNewestProducts() {
     });
     if (!response.ok) {
       console.error(`Fetch error: ${response.status} ${response.statusText}`);
-      return data;
+      return [];
     }
-    const result = await response.json();
-    data.push(...result);
-    return data;
+    return await response.json();
   } catch (err) {
     console.error("Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource.", err);
-    return data;
+    return [];
   }
+}
+
+export async function fetchRatings({ signal, club = "", division = "", search = "", page = 1, pageSize = 50 } = {}) {
+  const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+  if (club) params.set("club", club);
+  if (division && division !== "all") params.set("division", division);
+  if (search) params.set("search", search);
+  const response = await fetch(`${API_URL}/ratings?${params}`, { signal });
+  if (!response.ok) {
+    throw new Error(`Failed to load ratings: ${response.status}`);
+  }
+  const result = await response.json();
+  if (!result || !Array.isArray(result.items)) {
+    throw new Error('Ratings response has an invalid shape');
+  }
+  return result;
+}
+
+export async function fetchPlayer(id, { signal } = {}) {
+  const response = await fetch(`${API_URL}/players/${encodeURIComponent(id)}`, { signal });
+  if (!response.ok) throw new Error(`Failed to load player: ${response.status}`);
+  return response.json();
 }

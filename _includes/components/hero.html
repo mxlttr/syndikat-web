@@ -1,7 +1,6 @@
-{%- capture hero_src -%}{% include snippets/netlify_image_url.html src="/assets/images/hero.jpg" w=1200 %}{%- endcapture
--%}
-{%- capture hero_srcset -%}{% include snippets/netlify_srcset.html src="/assets/images/hero.jpg"
-widths="200,470,762,1020,1136,1200" %}{%- endcapture -%}
+{%- assign hero_image = site.hero_image | default: "/assets/images/hero.jpg" -%}
+{%- capture hero_src -%}{% include snippets/netlify_image_url.html src=hero_image w=1200 %}{%- endcapture -%}
+{%- capture hero_srcset -%}{% include snippets/netlify_srcset.html src=hero_image widths="200,470,762,1020,1136,1200" %}{%- endcapture -%}
 <section class="hero">
   <div class="container">
     <div class="row">
@@ -11,20 +10,23 @@ widths="200,470,762,1020,1136,1200" %}{%- endcapture -%}
             <h1 class="hero__title">Hey, wir sind das Syndikat</h1>
             <p class="hero__description">{{- site.description | escape -}}</p>
             <div class="hero__subscribe">
-              <button class="button button--primary button--icon plausible-event-name=discord_click" id="btn-discord"
+              <button class="button button--primary button--icon" id="btn-discord" data-umami-event="discord_click"
                 type="submit" onclick="window.open('\/\/community.syndikat.golf');">
                 {% include snippets/logo-discord.html %}
                 Discord beitreten
               </button>
-              <a href="/register/" class="button plausible-event-name=member_click" id="btn-membership">Mitglied
+              <a href="/register/" class="button" id="btn-membership" data-umami-event="member_click">Mitglied
                 werden</a>
             </div>
           </div>
           <div class="hero__right">
             <div class="hero__image">
-              <img src="{{ hero_src | strip }}" width="534" height="400" srcset="{{ hero_srcset | strip }}"
-                sizes="(max-width: 576px) 470px, (max-width: 768px) 560px, (max-width: 1024px) 740px, 600px"
-                alt="Discgolfscheiben in einem Rucksack">
+              <picture>
+                <source media="(min-width: 577px)" srcset="{{ hero_srcset | strip }}"
+                  sizes="(max-width: 768px) 560px, (max-width: 1024px) 740px, 600px">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" width="534" height="400"
+                  alt="Discgolfscheiben in einem Rucksack">
+              </picture>
             </div>
           </div>
         </div>

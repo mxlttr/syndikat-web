@@ -1,6 +1,6 @@
-const DEFAULT_DEV_API_URL = 'http://localhost:8080';
-const DEFAULT_PROD_API_URL = 'https://api.syndikat.golf';
 const API_URL = resolveApiBaseUrl();
+const TRENDING_UP_ICON = '<svg class="lucide color--green" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 7h5v5"/><path d="m21 7-7 7-4-4-7 7"/></svg>';
+const TRENDING_DOWN_ICON = '<svg class="lucide color--red" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 17h5v-5"/><path d="m21 17-7-7-4 4-7-7"/></svg>';
 
 function renderRatings(ratings, $el) {
   let index = 0;
@@ -23,14 +23,17 @@ function renderRatings(ratings, $el) {
             </div>
           </div>
         </td>
-        <td>${entry.rating} ${entry.ratingChange > 0 ? '<i class="ion ion-ios-trending-up color--green"></i>' : entry.ratingChange < 0 ? '<i class="ion ion-ios-trending-down color--red"></i>' : ''}</td>
+        <td>${entry.rating} ${entry.ratingChange > 0 ? TRENDING_UP_ICON : entry.ratingChange < 0 ? TRENDING_DOWN_ICON : ''}</td>
         <td><span class="pill" data-division="${entry.division}">${entry.division}</span></td>
         <td>${entry.divisionRank}<span class="percentile">Top ${Math.ceil(entry.divisionRank / entry.divisionCount * 100)}%</span></td>
-        <td>${entry.dmRounds}/${entry.roundCount}</td>
         <td>${formatDate(entry.lastRound, false)}</td>
       </tr>
     `
   }).join('');
+}
+
+function renderRatingsError($el) {
+  $el.innerHTML = '<tr><td class="ratings-error" colspan="7">Ratings konnten gerade nicht geladen werden. Bitte versuche es später erneut.</td></tr>';
 }
 
 async function getDivisions(ratings) {
@@ -46,22 +49,18 @@ async function initRatings() {
   if (!$el) return;
 
   try {
-    const ratings = await fetch(`${API_URL}/ratings`).then(response => response.json());
+    // Keep the full list here; club-specific views can use /ratings/${encodeURIComponent(club)}.
+    const response = await fetch(`${API_URL}/ratings`);
+    if (!response.ok) throw new Error(`Failed to load ratings: ${response.status}`);
+    const ratings = await response.json();
+    if (!Array.isArray(ratings)) throw new Error('Ratings response is not an array');
     await getDivisions(ratings);
     await renderRatings(ratings, $el);
     setupListeners($el.querySelectorAll('tr'));
   } catch (err) {
     console.error(err);
+    renderRatingsError($el);
   }
-}
-
-function resolveApiBaseUrl() {
-  if (typeof window !== 'undefined') {
-    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-    return isLocalhost ? DEFAULT_DEV_API_URL : DEFAULT_PROD_API_URL;
-  }
-
-  return DEFAULT_PROD_API_URL;
 }
 
 function setupListeners($rows) {
@@ -160,6 +159,17 @@ function setupListeners($rows) {
       }
     });
   });
+}
+
+function formatDate(date, weekday = true) {
+  const dateOptions = {
+    weekday: weekday ? "long" : undefined,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  };
+
+  return new Date(date).toLocaleDateString("de-DE", dateOptions);
 }
 
 initRatings();

@@ -3,17 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "scripts": {
+    "build:assets": "run-p build:svelte build:css",
+    "build:critical": "npm run install:chrome && node critical.js",
+    "build:css": "node scripts/minify-css.mjs",
+    "build:jekyll": "JEKYLL_ENV=production mise exec -- bundle exec jekyll build",
     "build:svelte": "npm run build -C svelte-components",
-    "build:jekyll": "bundle exec jekyll build",
-    "build:critical": "node critical.js",
-    "build": "npm run build:svelte && npm run build:jekyll && npm run build:critical",
-    "dev": "concurrently \"npm run dev:svelte\" \"npm run dev:jekyll\"",
-    "dev:jekyll": "bundle exec jekyll serve",
+    "build": "run-s build:assets build:jekyll build:critical",
+    "clean": "mise exec -- bundle exec jekyll clean",
+    "dev:jekyll": "mise exec -- bundle exec jekyll serve",
     "dev:svelte": "npm run --prefix svelte-components dev",
-    "clean": "bundle exec jekyll clean",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "dev": "run-p dev:svelte dev:jekyll",
+    "install:chrome": "puppeteer browsers install chrome",
+    "prepare": "husky",
+    "start": "npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
@@ -21,19 +28,23 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.0",
     "awesomplete": "^1.1.7",
+    "clean-css": "^5.3.3",
     "concurrently": "^9.2.1",
-    "critical": "^7.2.1",
     "husky": "^9.0.11",
+    "lucide-static": "^1.12.0",
+    "lucide-svelte": "^1.0.1",
+    "npm-run-all": "^4.1.5",
     "rollup": "^3.15.0",
     "rollup-plugin-css-only": "^4.3.0",
-    "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.1.2",
-    "sirv-cli": "^2.0.0",
     "svelte": "^3.55.0",
     "svelte-spa-router": "^4.0.1",
     "tippy.js": "^6.3.7"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "penthouse-esm": "^3.0.0"
+  }
 }
