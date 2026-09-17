@@ -214,7 +214,7 @@
         <th scope="col">Rating</th>
         <th scope="col">Division</th>
         <th scope="col">Rang in Division</th>
-        <th scope="col">DM-Runden</th>
+        <th scope="col">Runden</th>
         <th scope="col">letzte Runde</th>
       </tr>
     </thead>
@@ -315,7 +315,7 @@
                 >
               {/if}
             </td>
-            <td>{player.dmRounds}/{player.roundCount}</td>
+            <td>{player.roundCount}</td>
             <td>{player.lastRoundLabel}</td>
           </tr>
         {:else}

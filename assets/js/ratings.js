@@ -26,7 +26,6 @@ function renderRatings(ratings, $el) {
         <td>${entry.rating} ${entry.ratingChange > 0 ? TRENDING_UP_ICON : entry.ratingChange < 0 ? TRENDING_DOWN_ICON : ''}</td>
         <td><span class="pill" data-division="${entry.division}">${entry.division}</span></td>
         <td>${entry.divisionRank}<span class="percentile">Top ${Math.ceil(entry.divisionRank / entry.divisionCount * 100)}%</span></td>
-        <td>${entry.dmRounds}/${entry.roundCount}</td>
         <td>${formatDate(entry.lastRound, false)}</td>
       </tr>
     `
