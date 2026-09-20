@@ -14,6 +14,7 @@
     "build:svelte": "npm run build -C svelte-components",
     "build": "run-s build:assets build:jekyll build:critical",
     "clean": "mise exec -- bundle exec jekyll clean",
+    "clean:discs": "node scripts/dedupe-discs.mjs",
     "dev:jekyll": "mise exec -- bundle exec jekyll serve",
     "dev:svelte": "npm run --prefix svelte-components dev",
     "dev": "run-p dev:svelte dev:jekyll",
