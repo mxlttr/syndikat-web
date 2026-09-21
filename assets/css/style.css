@@ -5498,6 +5498,54 @@ table.on-tour td:nth-child(3) {
   margin-bottom: 16px;
 }
 
+.disc-recommendation__form {
+  padding: 24px;
+  margin: 32px 0;
+  background: var(--background-alt-color);
+  border-radius: 6px;
+}
+
+.disc-recommendation__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.disc-recommendation label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.disc-recommendation select {
+  width: 100%;
+  padding: 12px;
+  color: var(--text-color);
+  background: var(--background-color);
+  border: 1px solid var(--gray);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.disc-recommendation__note {
+  color: var(--text-alt-color);
+  font-size: 0.9em;
+}
+
+.disc-recommendation__result {
+  padding: 20px;
+  border-left: 4px solid var(--brand-color);
+  background: var(--background-alt-color);
+}
+
+@media screen and (max-width: 600px) {
+  .disc-recommendation__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Week dividers shared by the events and tournament overview tables. */
 .tournaments-table tbody tr.tournaments-table__week,
 .tournaments-table tbody tr.tournaments-table__week:hover {

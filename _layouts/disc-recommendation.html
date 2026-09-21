@@ -1,0 +1,88 @@
+---
+layout: default
+---
+<div class="page-head">
+  <div class="container">
+    <div class="row">
+      <div class="col col-12">
+        <div class="page__info">
+          <h1 class="page__title">{{- page.title -}}</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container animate">
+  <article class="page">
+    <div class="page__content disc-recommendation">
+      {{ content }}
+
+      <form class="disc-recommendation__form" data-disc-recommendation-form>
+        <div class="disc-recommendation__grid">
+          <label>
+            Erfahrungslevel
+            <select name="skill" required>
+              <option value="beginner" selected>Einsteiger:in</option>
+              <option value="intermediate">Fortgeschritten</option>
+              <option value="advanced">Turnierspieler:in</option>
+            </select>
+          </label>
+
+          <label>
+            Wurfweite (max.)
+            <select name="distance" required>
+              <option value="60" selected>Bis 60 m</option>
+              <option value="90">60–90 m</option>
+              <option value="120">90–120 m</option>
+              <option value="150">Mehr als 120 m</option>
+            </select>
+          </label>
+
+          <label>
+            Wurfart
+            <select name="throwType" required>
+              <option value="backhand" selected>Vor allem Backhand</option>
+              <option value="forehand">Vor allem Forehand</option>
+              <option value="both">Beides</option>
+            </select>
+          </label>
+
+          <label>
+            Gesuchte Scheibe
+            <select name="category" required>
+              <option value="midrange" selected>Midrange</option>
+              <option value="putter">Putter</option>
+              <option value="approach">Approach</option>
+              <option value="control-driver">Fairway / Control Driver</option>
+              <option value="distance-driver">Distance Driver</option>
+            </select>
+          </label>
+
+          <label>
+            Gewünschte Stabilität
+            <select name="stability" required>
+              <option value="understable" selected>Understable</option>
+              <option value="stable">Stable</option>
+              <option value="overstable">Overstable</option>
+            </select>
+          </label>
+
+          <label>
+            Einsatz
+            <select name="shot" required>
+              <option value="straight" selected>Gerade Würfe</option>
+              <option value="turnover">Turnover / Anhyzer</option>
+              <option value="hyzer">Hyzer</option>
+              <option value="approach">Kontrollierte Annäherung</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="button button--primary" type="submit">Scheiben finden</button>
+      </form>
+
+      <div class="disc-recommendation__result" data-disc-recommendation-result hidden aria-live="polite"></div>
+    </div>
+  </article>
+</div>
