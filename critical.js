@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-import penthouse from 'penthouse-esm';
+import critical from 'critical';
 
 const siteDir = path.resolve('_site');
 const directCriticalRoutes = new Set([
@@ -20,18 +19,8 @@ const directCriticalRoutes = new Set([
   '/training/',
   '/turniere/',
 ]);
-const sharedCriticalGroups = [
-  {
-    name: 'blog-posts',
-    sourceRoute: '/blog/die-besten-scheiben-fuer-discgolf-einsteiger/',
-    matchesRoute: (route) => route.startsWith('/blog/') && !/^\/blog\/(?:page\d+\/)?$/.test(route),
-  },
-];
-const criticalViewports = [
-  { width: 375, height: 667 },
-  { width: 1366, height: 768 },
-  { width: 1920, height: 1080 },
-];
+
+const blogSourceRoute = '/blog/die-besten-scheiben-fuer-discgolf-einsteiger/';
 const stylesheet = ['normalize.css', 'style.min.css']
   .map((file) => fs.readFileSync(path.join(siteDir, 'assets/css', file), 'utf8'))
   .join('\n');
@@ -42,8 +31,7 @@ function getHtmlFiles(dir) {
   const list = fs.readdirSync(dir);
   list.forEach((file) => {
     const filePath = path.join(dir, file);
-    const stat = fs.statSync(filePath);
-    if (stat && stat.isDirectory()) {
+    if (fs.statSync(filePath).isDirectory()) {
       results = results.concat(getHtmlFiles(filePath));
     } else if (file.endsWith('.html')) {
       results.push(filePath);
@@ -57,10 +45,6 @@ function filePathToRoute(file) {
 
   if (relativePath === 'index.html') {
     return '/';
-  }
-
-  if (relativePath === '404.html') {
-    return '/404/';
   }
 
   if (relativePath.endsWith('/index.html')) {
@@ -85,23 +69,15 @@ function inlineCssIntoFile(file, css, label) {
   fs.writeFileSync(file, nextHtml);
 }
 
-/**
- * Penthouse generates a stylesheet per viewport. Combining the three preserves
- * the previous mobile, desktop, and wide-screen coverage from `critical`.
- */
 async function generateCriticalCss(file) {
-  const url = pathToFileURL(file).href;
-  const stylesheets = await Promise.all(
-    criticalViewports.map(({ width, height }) =>
-      penthouse({
-        url,
-        cssString: stylesheet,
-        width,
-        height,
-      }),
-    ),
-  );
-  return stylesheets.join('\n');
+  const html = fs.readFileSync(file, 'utf8');
+  const { css } = await critical({
+    html,
+    css: stylesheet,
+    base: siteDir,
+    engine: 'static',
+  });
+  return css;
 }
 
 async function inlineDirectCriticalCss(htmlFiles) {
@@ -113,34 +89,32 @@ async function inlineDirectCriticalCss(htmlFiles) {
       inlineCssIntoFile(file, css, 'page');
       console.log(`✅ Fixed & Inlined: ${path.relative(siteDir, file)}`);
     } catch (err) {
-      console.error(`❌ Failed: ${file}`, err.message);
+      throw new Error(`Failed critical CSS for ${file}: ${err.message}`, { cause: err });
     }
   }
 }
 
 async function inlineSharedCriticalCss(htmlFiles) {
   const filesByRoute = new Map(htmlFiles.map((file) => [filePathToRoute(file), file]));
+  const sourceFile = filesByRoute.get(blogSourceRoute);
 
-  for (const group of sharedCriticalGroups) {
-    const sourceFile = filesByRoute.get(group.sourceRoute);
+  if (!sourceFile) {
+    throw new Error(`Missing source route ${blogSourceRoute} for shared blog critical CSS`);
+  }
 
-    if (!sourceFile) {
-      console.error(`❌ Failed: missing source route ${group.sourceRoute} for ${group.name}`);
-      continue;
+  try {
+    const css = await generateCriticalCss(sourceFile);
+    const blogFiles = htmlFiles.filter((file) => {
+      const route = filePathToRoute(file);
+      return route.startsWith('/blog/') && !/^\/blog\/(?:page\d+\/)?$/.test(route);
+    });
+
+    for (const file of blogFiles) {
+      inlineCssIntoFile(file, css, 'blog-posts');
+      console.log(`✅ Inlined shared critical CSS (blog-posts): ${path.relative(siteDir, file)}`);
     }
-
-    try {
-      const css = await generateCriticalCss(sourceFile);
-
-      const targetFiles = htmlFiles.filter((file) => group.matchesRoute(filePathToRoute(file)));
-
-      for (const file of targetFiles) {
-        inlineCssIntoFile(file, css, group.name);
-        console.log(`✅ Inlined shared critical CSS (${group.name}): ${path.relative(siteDir, file)}`);
-      }
-    } catch (err) {
-      console.error(`❌ Failed shared critical CSS (${group.name}): ${err.message}`);
-    }
+  } catch (err) {
+    throw new Error(`Failed shared blog critical CSS: ${err.message}`, { cause: err });
   }
 }
 
@@ -151,4 +125,8 @@ async function inlineCriticalCss() {
   await inlineSharedCriticalCss(htmlFiles);
 }
 
-inlineCriticalCss().catch(console.error);
+inlineCriticalCss().catch((err) => {
+  console.error(`❌ Critical CSS generation failed: ${err.message}`);
+  process.exitCode = 1;
+});
+

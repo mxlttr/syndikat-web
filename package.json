@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build:assets": "run-p build:svelte build:css",
-    "build:critical": "npm run install:chrome && node critical.js",
+    "build:critical": "node critical.js",
     "build:css": "node scripts/minify-css.mjs",
     "build:jekyll": "JEKYLL_ENV=production mise exec -- bundle exec jekyll build",
     "build:svelte": "npm run build -C svelte-components",
@@ -18,7 +18,6 @@
     "dev:jekyll": "mise exec -- bundle exec jekyll serve",
     "dev:svelte": "npm run --prefix svelte-components dev",
     "dev": "run-p dev:svelte dev:jekyll",
-    "install:chrome": "puppeteer browsers install chrome",
     "start": "npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -44,9 +43,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "penthouse-esm": "^3.0.0"
-  },
-  "allowScripts": {
-    "puppeteer@25.7.0": true
+    "critical": "^9.0.0"
   }
 }
