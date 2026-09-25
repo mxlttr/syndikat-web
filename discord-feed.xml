@@ -1,0 +1,22 @@
+---
+layout: null
+sitemap: false
+---
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>{{ site.title | xml_escape }} — Discord blog feed</title>
+    <link>{{ site.url | xml_escape }}</link>
+    <description>{{ site.description | strip_newlines | xml_escape }}</description>
+    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+    {% for post in site.posts limit:1 %}
+    <item>
+      <title>{{ post.title | xml_escape }}</title>
+      <link>{{ site.url }}{{ post.url }}?utm_source=discord&amp;utm_medium=community&amp;utm_campaign=blog&amp;utm_content={{ post.slug | uri_escape }}</link>
+      <guid isPermaLink="false">{{ site.url }}{{ post.url }}</guid>
+      <pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
+      <description>{{ post.excerpt | strip_html | normalize_whitespace | xml_escape }}</description>
+    </item>
+    {% endfor %}
+  </channel>
+</rss>

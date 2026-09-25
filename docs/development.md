@@ -25,6 +25,18 @@ Create regular pages as root-level Markdown files with front matter and posts as
 
 Images and other static files belong under `assets/`. Check responsive image and image-CDN behavior before adding very large assets. Editing `_config.yml` requires restarting Jekyll because it is not reloaded by `jekyll serve`.
 
+### Campaign links
+
+Tag links shared in Discord with Umami UTM parameters so visits can be attributed even when Discord does not pass a referrer. Keep `utm_source=discord` and `utm_medium=community` consistent, and use lowercase values. Give each campaign a descriptive `utm_campaign`; use `utm_content` when distinguishing posts or placements. For example:
+
+```text
+https://syndikat.golf/ratings/?utm_source=discord&utm_medium=community&utm_campaign=ratings-share&utm_content=announcements
+```
+
+Umami records UTM parameters automatically; no page-tracking code change is needed. Review the **UTM** report in Umami to see the tagged traffic.
+
+For Readybot's automatic blog posts, use the dedicated `/discord-feed.xml` feed. It adds the same Discord campaign tags to article links while leaving the regular `/feed.xml` links canonical for other feed readers. The Discord feed contains only the latest post to avoid replaying the site's full post archive when connecting it.
+
 ## API configuration
 
 Browser code currently chooses `http://localhost:8080` for `localhost`/`127.0.0.1` and `https://api.syndikat.golf` otherwise. The Svelte build additionally accepts `API_URL` at build time. The consumed features are:
