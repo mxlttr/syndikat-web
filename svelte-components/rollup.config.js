@@ -1,19 +1,22 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
-import terser from '@rollup/plugin-terser';
+import { minify } from 'rollup-plugin-esbuild-minify';
 import resolve from '@rollup/plugin-node-resolve';
 import css from 'rollup-plugin-css-only';
 import replace from '@rollup/plugin-replace';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-	input: 'src/main.js',
+	input: path.resolve(__dirname, 'src/main.js'),
 	output: {
-		sourcemap: true,
+		sourcemap: !production,
 		format: 'iife',
 		name: 'app',
-		file: '../assets/svelte-bundle.js',
+		file: path.resolve(__dirname, '../assets/svelte-bundle.js'),
 		globals: {
 			'tippy.js': 'tippy'
 		}
@@ -44,7 +47,7 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser(),
+		production && minify(),
 
 		replace({
 			'process.env.API_URL': JSON.stringify(process.env.API_URL),
