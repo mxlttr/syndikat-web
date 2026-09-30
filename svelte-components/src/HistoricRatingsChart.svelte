@@ -1,11 +1,21 @@
 <script>
+  import { TrendingDown, TrendingUp } from "lucide-svelte";
+
   export let ratings = [];
   export let playerName = "";
 
   const chartWidth = 640;
   const chartHeight = 280;
   const chartMargins = { top: 20, right: 20, bottom: 42, left: 64 };
+  const yearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
+  const rangeOptions = [
+    { id: "ytd", label: "YTD" },
+    { id: "1y", label: "1Y" },
+    { id: "3y", label: "3Y" },
+    { id: "all", label: "Alle" },
+  ];
   let activePoint = null;
+  let selectedRange = "1y";
 
   function formatDate(value) {
     const date = new Date(value);
@@ -15,7 +25,9 @@
   }
 
   function formatRating(value) {
-    return Number(value).toFixed(3);
+    return new Intl.NumberFormat("de-DE", {
+      maximumFractionDigits: 0,
+    }).format(Number(value));
   }
 
   $: history = ratings
@@ -25,7 +37,47 @@
       numericRating: Number(point.rating),
     }))
     .filter((point) => Number.isFinite(point.timestamp) && Number.isFinite(point.numericRating));
-  $: chart = buildChart(history);
+  $: visibleHistory = filterHistory(history, selectedRange);
+  $: trendSummary = buildTrendSummary(visibleHistory, selectedRange);
+  $: chart = buildChart(visibleHistory);
+
+  function filterHistory(points, range) {
+    if (points.length < 2 || range === "all") return points;
+
+    const latestTimestamp = points[points.length - 1].timestamp;
+    let startTimestamp = latestTimestamp - yearInMilliseconds;
+    if (range === "3y") startTimestamp = latestTimestamp - 3 * yearInMilliseconds;
+    if (range === "ytd") {
+      const latestDate = new Date(latestTimestamp);
+      startTimestamp = Date.UTC(latestDate.getUTCFullYear(), 0, 1);
+    }
+    const filtered = points.filter((point) => point.timestamp >= startTimestamp);
+    return filtered.length >= 2 ? filtered : points;
+  }
+
+  function buildTrendSummary(points, range) {
+    if (points.length < 2) return null;
+
+    const firstRating = points[0].numericRating;
+    const lastRating = points[points.length - 1].numericRating;
+    const change = lastRating - firstRating;
+    const percentage = firstRating ? (change / firstRating) * 100 : 0;
+    const rangeLabel = rangeOptions.find((option) => option.id === range)?.label ?? "Alle";
+
+    return {
+      change,
+      direction: change >= 0 ? "up" : "down",
+      firstRating,
+      lastRating,
+      percentage,
+      label: rangeLabel,
+    };
+  }
+
+  function selectRange(range) {
+    selectedRange = range;
+    activePoint = null;
+  }
 
   function buildChart(points) {
     if (points.length < 2) return null;
@@ -60,7 +112,27 @@
 
 {#if chart}
   <div class="rating-history" aria-label="Historischer Ratingverlauf">
-    <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label={`Historischer Ratingverlauf von ${playerName}`}>
+    {#if trendSummary}
+      <div class="rating-history__header">
+        <div class="rating-history__quote" aria-label={`Aktuelles Rating ${formatRating(trendSummary.lastRating)}, Veränderung ${trendSummary.change >= 0 ? "plus" : "minus"} ${formatRating(Math.abs(trendSummary.change))} seit ${trendSummary.label}`}>
+          <span class:rating-history__change--down={trendSummary.direction === "down"} class="rating-history__change">
+            {#if trendSummary.direction === "up"}
+              <TrendingUp size={14} strokeWidth={2.5} aria-hidden="true" />
+            {:else}
+              <TrendingDown size={14} strokeWidth={2.5} aria-hidden="true" />
+            {/if}
+            {trendSummary.change >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.change))} ({trendSummary.percentage >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.percentage))} %)
+          </span>
+        </div>
+        <nav class="rating-history__ranges" aria-label="Zeitraum auswählen">
+          {#each rangeOptions as option}
+            <button type="button" class:rating-history__range--active={selectedRange === option.id} aria-pressed={selectedRange === option.id} on:click={() => selectRange(option.id)}>{option.label}</button>
+          {/each}
+        </nav>
+      </div>
+    {/if}
+    <div class="rating-history__plot">
+      <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label={`Historischer Ratingverlauf von ${playerName}`}>
       {#each chart.yTicks as tick, index}
         <line class="rating-history__grid" x1={chartMargins.left} x2={chartWidth - chartMargins.right} y1={tick.y} y2={tick.y} />
         {#if !activePoint}
@@ -92,15 +164,25 @@
         <text class="rating-history__label" x={chart.xStart.x} y={chartHeight - 12}>{chart.xStart.label}</text>
         <text class="rating-history__label" x={chart.xEnd.x} y={chartHeight - 12} text-anchor="end">{chart.xEnd.label}</text>
       {/if}
-    </svg>
+      </svg>
+    </div>
   </div>
 {:else}
   <p class="rating-modal__muted rating-history__empty">Keine historischen Ratingdaten vorhanden.</p>
 {/if}
 
 <style>
-  .rating-history { position: relative; margin: 0 0 1.5rem; overflow-x: auto; padding-bottom: .25rem; }
-  .rating-history svg { display: block; width: 100%; min-width: 32rem; height: 280px; overflow: visible; }
+  .rating-history { position: relative; margin: 0 0 1.5rem; padding-bottom: .25rem; }
+  .rating-history__header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin: 0 0 .75rem; }
+  .rating-history__quote { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: .55rem; row-gap: .15rem; color: var(--heading-font-color, #1e2740); }
+  .rating-history__change { display: inline-flex; align-items: center; gap: .2rem; color: var(--success-color, #2ca66f); font-size: .9rem; font-weight: 700; }
+  .rating-history__change--down { color: var(--warning-color, #d14b4b); }
+  .rating-history__ranges { display: flex; gap: .15rem; padding: .15rem; border-radius: .4rem; background: color-mix(in srgb, var(--heading-font-color, #1e2740) 8%, transparent); }
+  .rating-history__ranges button { border: 0; border-radius: .3rem; background: transparent; color: var(--heading-font-color, #1e2740); cursor: pointer; font: inherit; font-size: .75rem; font-weight: 700; opacity: .65; padding: .3rem .5rem; }
+  .rating-history__ranges button:hover, .rating-history__ranges button:focus-visible { opacity: 1; }
+  .rating-history__ranges .rating-history__range--active { background: var(--background-color, #fff); box-shadow: 0 1px 3px rgb(0 0 0 / 18%); opacity: 1; }
+  .rating-history__plot { overflow-x: auto; }
+  .rating-history__plot > svg { display: block; width: 100%; min-width: 32rem; height: 280px; overflow: visible; }
   .rating-history__grid { stroke: var(--border-color, #dfe5ef); stroke-dasharray: 3 4; stroke-width: 1; }
   .rating-history__crosshair { stroke: var(--dark-blue, #1e2740); stroke-width: 1; opacity: .55; pointer-events: none; }
   :global([dark]) .rating-history__crosshair { stroke: var(--light-gray, #f0f0f0); }

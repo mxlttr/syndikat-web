@@ -43,6 +43,37 @@
   function trackExternalLink(destination) {
     trackEvent("ratings_external_link_click", { destination });
   }
+
+  function syncFilterUrl() {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    const query = search.trim();
+
+    if (query) params.set("search", query);
+    else params.delete("search");
+    params.delete("q");
+    if (division !== "all") params.set("division", division);
+    else params.delete("division");
+    if (club !== "syndikat-only") params.set("club", club);
+    else params.delete("club");
+
+    const nextUrl = `${url.pathname}${params.toString() ? `?${params}` : ""}${url.hash}`;
+    window.history.replaceState(window.history.state, "", nextUrl);
+  }
+
+  function restoreFiltersFromUrl() {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const urlClub = params.get("club");
+
+    search = params.get("search") || params.get("q") || "";
+    division = params.get("division") || "all";
+    club = ["syndikat-only", "cologne-only", "all"].includes(urlClub)
+      ? urlClub
+      : "syndikat-only";
+  }
+
   async function loadRatings(requestedPage = currentPage) {
     ratingsController?.abort();
     const controller = new AbortController();
@@ -79,6 +110,7 @@
   }
 
   onMount(() => {
+    restoreFiltersFromUrl();
     loadRatings();
     return () => ratingsController?.abort();
   });
@@ -98,6 +130,7 @@
       club = "all";
       division = "all";
     }
+    syncFilterUrl();
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => loadRatings(1), 250);
   }
@@ -177,6 +210,7 @@
       on:change={() => {
         search = "";
         trackRatingsFilter("division", division);
+        syncFilterUrl();
         loadRatings(1);
       }}
       disabled={loading || error}
@@ -191,6 +225,7 @@
       on:change={() => {
         search = "";
         trackRatingsFilter("club", club);
+        syncFilterUrl();
         loadRatings(1);
       }}
       disabled={loading || error}
