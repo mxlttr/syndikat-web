@@ -111,8 +111,15 @@
 
   onMount(() => {
     restoreFiltersFromUrl();
+    const handleKeydown = (event) => {
+      if (event.key === "Escape" && selectedPlayer) closePlayer();
+    };
+    window.addEventListener("keydown", handleKeydown);
     loadRatings();
-    return () => ratingsController?.abort();
+    return () => {
+      ratingsController?.abort();
+      window.removeEventListener("keydown", handleKeydown);
+    };
   });
 
   $: totalPages = Math.max(1, Math.ceil(totalPlayers / pageSize));
@@ -438,7 +445,7 @@
 <style>
   .rating-modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; background: rgb(0 0 0 / 55%); }
   .rating-modal { position: relative; width: min(42rem, 100%); max-height: 90vh; overflow: auto; padding: 2rem; border-radius: 1rem; background: var(--background-color, #fff); color: var(--text-color, #222); box-shadow: 0 1rem 3rem rgb(0 0 0 / 30%); }
-  .rating-modal__close { position: absolute; top: .5rem; right: .75rem; border: 0; background: transparent; font-size: 2rem; cursor: pointer; }
+  .rating-modal__close { position: absolute; top: .5rem; right: .75rem; border: 0; background: transparent; color: inherit; -webkit-appearance: none; appearance: none; -webkit-text-fill-color: currentColor; font-size: 2rem; cursor: pointer; }
   .rating-modal__hero { display: flex; align-items: center; gap: 1rem; padding-bottom: 1.5rem; }
   .rating-modal__avatar { display: grid; width: 4.5rem; height: 4.5rem; place-items: center; border-radius: 50%; color: #fff; font-size: 1.35rem; font-weight: 700; }
   .rating-modal__eyebrow { margin: 0; color: var(--brand-color, #4f46e5); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }

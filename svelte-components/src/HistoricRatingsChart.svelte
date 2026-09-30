@@ -4,7 +4,6 @@
   export let ratings = [];
   export let playerName = "";
 
-  const chartWidth = 640;
   const chartHeight = 280;
   const chartMargins = { top: 20, right: 20, bottom: 42, left: 64 };
   const yearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
@@ -16,6 +15,7 @@
   ];
   let activePoint = null;
   let selectedRange = "1y";
+  let renderWidth = 640;
 
   function formatDate(value) {
     const date = new Date(value);
@@ -36,10 +36,21 @@
       timestamp: new Date(point.date).getTime(),
       numericRating: Number(point.rating),
     }))
-    .filter((point) => Number.isFinite(point.timestamp) && Number.isFinite(point.numericRating));
+    .filter((point) => Number.isFinite(point.timestamp) && Number.isFinite(point.numericRating))
+    .sort((a, b) => a.timestamp - b.timestamp);
   $: visibleHistory = filterHistory(history, selectedRange);
   $: trendSummary = buildTrendSummary(visibleHistory, selectedRange);
-  $: chart = buildChart(visibleHistory);
+  $: chart = buildChart(visibleHistory, renderWidth);
+
+  function measurePlot(node) {
+    const updateWidth = () => {
+      renderWidth = node.clientWidth || 640;
+    };
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(node);
+    updateWidth();
+    return { destroy: () => observer.disconnect() };
+  }
 
   function filterHistory(points, range) {
     if (points.length < 2 || range === "all") return points;
@@ -52,11 +63,11 @@
       startTimestamp = Date.UTC(latestDate.getUTCFullYear(), 0, 1);
     }
     const filtered = points.filter((point) => point.timestamp >= startTimestamp);
-    return filtered.length >= 2 ? filtered : points;
+    return filtered.length ? filtered : points.slice(-1);
   }
 
   function buildTrendSummary(points, range) {
-    if (points.length < 2) return null;
+    if (!points.length) return null;
 
     const firstRating = points[0].numericRating;
     const lastRating = points[points.length - 1].numericRating;
@@ -65,12 +76,13 @@
     const rangeLabel = rangeOptions.find((option) => option.id === range)?.label ?? "Alle";
 
     return {
-      change,
-      direction: change >= 0 ? "up" : "down",
+      change: points.length === 1 ? null : change,
+      direction: points.length === 1 ? null : change >= 0 ? "up" : "down",
       firstRating,
       lastRating,
-      percentage,
+      percentage: points.length === 1 ? null : percentage,
       label: rangeLabel,
+      singlePoint: points.length === 1,
     };
   }
 
@@ -79,10 +91,38 @@
     activePoint = null;
   }
 
-  function buildChart(points) {
-    if (points.length < 2) return null;
+  function reducePoints(points, width) {
+    const minimumDistance = width < 480 ? 16 : 9;
+    const groups = [];
+    points.forEach((point) => {
+      const group = groups[groups.length - 1];
+      if (!group || point.x - group[0].x >= minimumDistance) groups.push([point]);
+      else group.push(point);
+    });
 
-    const plotWidth = chartWidth - chartMargins.left - chartMargins.right;
+    return groups.map((group) => {
+      if (group.length === 1) return group[0];
+
+      const average = (key) => group.reduce((sum, point) => sum + point[key], 0) / group.length;
+      const first = group[0];
+      const last = group[group.length - 1];
+      return {
+        ...last,
+        x: average("x"),
+        y: average("y"),
+        numericRating: average("numericRating"),
+        ariaLabel: `${group.length} gebündelte Ratingspunkte zwischen ${formatDate(first.date)} und ${formatDate(last.date)}, Durchschnitt ${formatRating(average("numericRating"))}`,
+        dateLabel: `${formatDate(first.date)} – ${formatDate(last.date)}`,
+        ratingLabel: `Ø ${formatRating(average("numericRating"))}`,
+        pointCount: group.length,
+      };
+    });
+  }
+
+  function buildChart(points, width) {
+    if (!points.length) return null;
+
+    const plotWidth = width - chartMargins.left - chartMargins.right;
     const plotHeight = chartHeight - chartMargins.top - chartMargins.bottom;
     const values = points.map((point) => point.numericRating);
     const minimum = Math.min(...values);
@@ -90,11 +130,16 @@
     const padding = Math.max((maximum - minimum) * 0.12, 0.5);
     const lowerBound = minimum - padding;
     const upperBound = maximum + padding;
-    const firstTimestamp = points[0].timestamp;
-    const timeRange = points[points.length - 1].timestamp - firstTimestamp || 1;
+    const firstTimestamp = points.length === 1
+      ? points[0].timestamp - yearInMilliseconds
+      : points[0].timestamp;
+    const timeRange = points.length === 1
+      ? yearInMilliseconds
+      : points[points.length - 1].timestamp - firstTimestamp || 1;
     const x = (timestamp) => chartMargins.left + ((timestamp - firstTimestamp) / timeRange) * plotWidth;
     const y = (rating) => chartMargins.top + ((upperBound - rating) / (upperBound - lowerBound)) * plotHeight;
-    const chartPoints = points.map((point) => ({ ...point, x: x(point.timestamp), y: y(point.numericRating) }));
+    const rawChartPoints = points.map((point) => ({ ...point, x: x(point.timestamp), y: y(point.numericRating) }));
+    const chartPoints = reducePoints(rawChartPoints, width);
     const path = chartPoints.reduce(
       (value, point, index) => index === 0 ? `M ${point.x} ${point.y}` : `${value} H ${point.x} V ${point.y}`,
       "",
@@ -104,8 +149,8 @@
       points: chartPoints,
       path,
       yTicks: [maximum, (minimum + maximum) / 2, minimum].map((rating) => ({ rating, y: y(rating) })),
-      xStart: { label: formatDate(points[0].date), x: chartMargins.left },
-      xEnd: { label: formatDate(points[points.length - 1].date), x: chartWidth - chartMargins.right },
+      xStart: { label: points.length === 1 ? "" : formatDate(points[0].date), x: chartMargins.left },
+      xEnd: { label: formatDate(points[points.length - 1].date), x: width - chartMargins.right },
     };
   }
 </script>
@@ -114,15 +159,19 @@
   <div class="rating-history" aria-label="Historischer Ratingverlauf">
     {#if trendSummary}
       <div class="rating-history__header">
-        <div class="rating-history__quote" aria-label={`Aktuelles Rating ${formatRating(trendSummary.lastRating)}, Veränderung ${trendSummary.change >= 0 ? "plus" : "minus"} ${formatRating(Math.abs(trendSummary.change))} seit ${trendSummary.label}`}>
-          <span class:rating-history__change--down={trendSummary.direction === "down"} class="rating-history__change">
-            {#if trendSummary.direction === "up"}
-              <TrendingUp size={14} strokeWidth={2.5} aria-hidden="true" />
-            {:else}
-              <TrendingDown size={14} strokeWidth={2.5} aria-hidden="true" />
-            {/if}
-            {trendSummary.change >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.change))} ({trendSummary.percentage >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.percentage))} %)
-          </span>
+        <div class="rating-history__quote" aria-label={trendSummary.singlePoint ? `Aktuelles Rating ${formatRating(trendSummary.lastRating)}; keine Vergleichsdaten für ${trendSummary.label}` : `Aktuelles Rating ${formatRating(trendSummary.lastRating)}, Veränderung ${trendSummary.change >= 0 ? "plus" : "minus"} ${formatRating(Math.abs(trendSummary.change))} seit ${trendSummary.label}`}>
+          {#if trendSummary.singlePoint}
+            <span class="rating-history__period">Keine Vergleichsdaten für diesen Zeitraum</span>
+          {:else}
+            <span class:rating-history__change--down={trendSummary.direction === "down"} class="rating-history__change">
+              {#if trendSummary.direction === "up"}
+                <TrendingUp size={14} strokeWidth={2.5} aria-hidden="true" />
+              {:else}
+                <TrendingDown size={14} strokeWidth={2.5} aria-hidden="true" />
+              {/if}
+              {trendSummary.change >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.change))} ({trendSummary.percentage >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.percentage))} %)
+            </span>
+          {/if}
         </div>
         <nav class="rating-history__ranges" aria-label="Zeitraum auswählen">
           {#each rangeOptions as option}
@@ -131,10 +180,10 @@
         </nav>
       </div>
     {/if}
-    <div class="rating-history__plot">
-      <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label={`Historischer Ratingverlauf von ${playerName}`}>
+    <div class="rating-history__plot" use:measurePlot>
+      <svg viewBox={`0 0 ${renderWidth} ${chartHeight}`} role="img" aria-label={`Historischer Ratingverlauf von ${playerName}`}>
       {#each chart.yTicks as tick, index}
-        <line class="rating-history__grid" x1={chartMargins.left} x2={chartWidth - chartMargins.right} y1={tick.y} y2={tick.y} />
+        <line class="rating-history__grid" x1={chartMargins.left} x2={renderWidth - chartMargins.right} y1={tick.y} y2={tick.y} />
         {#if !activePoint}
           <text class="rating-history__label rating-history__label--y" x={chartMargins.left - 10} y={tick.y + 4}>{formatRating(tick.rating)}</text>
         {/if}
@@ -142,8 +191,8 @@
       {#if activePoint}
         <line class="rating-history__crosshair" x1={chartMargins.left} x2={activePoint.x} y1={activePoint.y} y2={activePoint.y} />
         <line class="rating-history__crosshair" x1={activePoint.x} x2={activePoint.x} y1={activePoint.y} y2={chartHeight - chartMargins.bottom} />
-        <text class="rating-history__crosshair-label rating-history__crosshair-label--y" x={chartMargins.left - 6} y={activePoint.y + 4}>{formatRating(activePoint.numericRating)}</text>
-        <text class="rating-history__crosshair-label" x={Math.max(chartMargins.left + 45, Math.min(activePoint.x, chartWidth - chartMargins.right - 45))} y={chartHeight - 12} text-anchor="middle">{formatDate(activePoint.date)}</text>
+        <text class="rating-history__crosshair-label rating-history__crosshair-label--y" x={chartMargins.left - 6} y={activePoint.y + 4}>{activePoint.ratingLabel || formatRating(activePoint.numericRating)}</text>
+        <text class="rating-history__crosshair-label" x={Math.max(chartMargins.left + 45, Math.min(activePoint.x, renderWidth - chartMargins.right - 45))} y={chartHeight - 12} text-anchor="middle">{activePoint.dateLabel || formatDate(activePoint.date)}</text>
       {/if}
       <path class="rating-history__line" d={chart.path} />
       {#each chart.points as point}
@@ -151,13 +200,13 @@
           class:rating-history__point--active={activePoint === point}
           tabindex="0"
           role="button"
-          aria-label={`${formatDate(point.date)}: ${formatRating(point.numericRating)}`}
+          aria-label={point.ariaLabel || `${formatDate(point.date)}: ${formatRating(point.numericRating)}`}
           on:mouseenter={() => (activePoint = point)}
           on:mouseleave={() => (activePoint = null)}
           on:focus={() => (activePoint = point)}
           on:blur={() => (activePoint = null)}
         >
-          <circle class="rating-history__point" cx={point.x} cy={point.y} r="4" />
+          <circle class:rating-history__point--cluster={point.pointCount > 1} class="rating-history__point" cx={point.x} cy={point.y} r={point.pointCount > 1 ? 5 : 4} />
         </g>
       {/each}
       {#if !activePoint}
@@ -177,17 +226,19 @@
   .rating-history__quote { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: .55rem; row-gap: .15rem; color: var(--heading-font-color, #1e2740); }
   .rating-history__change { display: inline-flex; align-items: center; gap: .2rem; color: var(--success-color, #2ca66f); font-size: .9rem; font-weight: 700; }
   .rating-history__change--down { color: var(--warning-color, #d14b4b); }
+  .rating-history__period { color: var(--heading-font-color, #1e2740); font-size: .8rem; opacity: .65; }
   .rating-history__ranges { display: flex; gap: .15rem; padding: .15rem; border-radius: .4rem; background: color-mix(in srgb, var(--heading-font-color, #1e2740) 8%, transparent); }
   .rating-history__ranges button { border: 0; border-radius: .3rem; background: transparent; color: var(--heading-font-color, #1e2740); cursor: pointer; font: inherit; font-size: .75rem; font-weight: 700; opacity: .65; padding: .3rem .5rem; }
   .rating-history__ranges button:hover, .rating-history__ranges button:focus-visible { opacity: 1; }
   .rating-history__ranges .rating-history__range--active { background: var(--background-color, #fff); box-shadow: 0 1px 3px rgb(0 0 0 / 18%); opacity: 1; }
-  .rating-history__plot { overflow-x: auto; }
-  .rating-history__plot > svg { display: block; width: 100%; min-width: 32rem; height: 280px; overflow: visible; }
+  .rating-history__plot { overflow: hidden; }
+  .rating-history__plot > svg { display: block; width: 100%; height: 280px; overflow: visible; }
   .rating-history__grid { stroke: var(--border-color, #dfe5ef); stroke-dasharray: 3 4; stroke-width: 1; }
   .rating-history__crosshair { stroke: var(--dark-blue, #1e2740); stroke-width: 1; opacity: .55; pointer-events: none; }
   :global([dark]) .rating-history__crosshair { stroke: var(--light-gray, #f0f0f0); }
   .rating-history__line { fill: none; stroke: var(--brand-color, #4f46e5); stroke-linejoin: round; stroke-linecap: round; stroke-width: 3; }
   .rating-history__point { fill: var(--background-color, #fff); stroke: var(--brand-color, #4f46e5); stroke-width: 2; cursor: pointer; outline: none; }
+  .rating-history__point--cluster { stroke-width: 2.5; }
   .rating-history__point:hover, .rating-history__point:focus, .rating-history__point--active .rating-history__point { fill: var(--brand-color, #4f46e5); stroke: var(--dark-blue, #1e2740); stroke-width: 3; }
   .rating-history__label { fill: var(--heading-font-color, #1e2740); font-size: 12px; }
   .rating-history__label--y { text-anchor: end; }
