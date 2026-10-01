@@ -166,7 +166,13 @@
     playerLoading = true;
     playerError = false;
     try {
-      selectedPlayer = { ...(await fetchPlayer(id)), rating: player.rating, divisionRank: player.divisionRank };
+      const playerDetails = await fetchPlayer(id);
+      selectedPlayer = {
+        ...playerDetails,
+        club: playerDetails.club || player.club,
+        rating: player.rating,
+        divisionRank: player.divisionRank,
+      };
     } catch (err) {
       playerError = true;
     } finally {
@@ -176,6 +182,20 @@
 
   function closePlayer() {
     selectedPlayer = null;
+  }
+
+  function openPlayer(player) {
+    trackEvent("ratings_player_open", {
+      gtNumber: player.gtNumber,
+      name: `${player.firstName} ${player.lastName}`,
+    });
+    showPlayer(player);
+  }
+
+  function handlePlayerRowKeydown(event, player) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    openPlayer(player);
   }
 
   function initials(name = "") {
@@ -285,7 +305,15 @@
           <tr><td class="ratings-error" colspan="7" role="alert">Die Aktualisierung konnte nicht geladen werden. Die zuletzt geladenen Ratings werden angezeigt.</td></tr>
         {/if}
         {#each players as player, index (player.gtNumber || player.link)}
-          <tr data-club={player.club}>
+          <tr
+            class="rating-player-row"
+            data-club={player.club}
+            role="button"
+            tabindex="0"
+            aria-label={`Spielerprofil von ${player.firstName} ${player.lastName} öffnen`}
+            on:click={() => openPlayer(player)}
+            on:keydown={(event) => handlePlayerRowKeydown(event, player)}
+          >
             <td>{(currentPage - 1) * pageSize + index + 1}</td>
             <td>
               <div class="name-cell">
@@ -307,7 +335,7 @@
                   </span>
                 {/if}
                 <div class="ranking-name-wrapper">
-                  <a href={player.link} on:click|preventDefault={() => { trackEvent("ratings_player_open", { gtNumber: player.gtNumber, name: `${player.firstName} ${player.lastName}` }); showPlayer(player); }}>{player.firstName} {player.lastName}</a>
+                  <span class="ranking-name-link">{player.firstName} {player.lastName}</span>
                   <div class="ranking-club">{player.club}</div>
                 </div>
               </div>
@@ -430,6 +458,10 @@
 
 <style>
   .rating-modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; background: rgb(0 0 0 / 55%); }
+  .rating-player-row { cursor: pointer; }
+  .rating-player-row:hover, .rating-player-row:focus-visible { background: var(--background-alt-color, rgb(0 0 0 / 5%)); outline: none; }
+  :global(#ratings .rating-player-row:hover > td), :global(#ratings .rating-player-row:focus-visible > td) { background: var(--background-alt-color, rgb(0 0 0 / 5%)); }
+  .ranking-name-link { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rating-modal { position: relative; width: min(42rem, 100%); max-height: 90vh; overflow: auto; padding: 2rem; border-radius: 1rem; background: var(--background-color, #fff); color: var(--text-color, #222); box-shadow: 0 1rem 3rem rgb(0 0 0 / 30%); }
   .rating-modal__close { position: absolute; top: .5rem; right: .75rem; border: 0; background: transparent; color: inherit; -webkit-appearance: none; appearance: none; -webkit-text-fill-color: currentColor; font-size: 2rem; cursor: pointer; }
   .rating-modal__hero { display: flex; align-items: center; gap: 1rem; padding-bottom: 1.5rem; }
