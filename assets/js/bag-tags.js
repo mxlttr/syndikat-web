@@ -5,7 +5,7 @@ async function initBagTags() {
   if (!$el) return;
 
   try {
-    const ranking = await fetch(`${API_URL}/bagtag`).then(response => response.json());
+    const ranking = await fetch(`${API_URL}/bagtag`, { credentials: 'include' }).then(response => response.json());
     renderRanking(ranking, $el);
   } catch (err) {
     console.error(err);

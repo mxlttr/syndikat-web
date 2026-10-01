@@ -66,6 +66,7 @@ export function streamProducts(query, callbacks = {}) {
 export async function fetchNewestProducts() {
   try {
     const response = await fetch(`${API_URL}/products/feed`, {
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -87,7 +88,7 @@ export async function fetchRatings({ signal, club = "", division = "", search = 
   if (club) params.set("club", club);
   if (division && division !== "all") params.set("division", division);
   if (search) params.set("search", search);
-  const response = await fetch(`${API_URL}/ratings?${params}`, { signal });
+  const response = await fetch(`${API_URL}/ratings?${params}`, { signal, credentials: 'include' });
   if (!response.ok) {
     throw new Error(`Failed to load ratings: ${response.status}`);
   }
@@ -99,7 +100,7 @@ export async function fetchRatings({ signal, club = "", division = "", search = 
 }
 
 export async function fetchPlayer(id, { signal } = {}) {
-  const response = await fetch(`${API_URL}/players/${encodeURIComponent(id)}`, { signal });
+  const response = await fetch(`${API_URL}/players/${encodeURIComponent(id)}`, { signal, credentials: 'include' });
   if (!response.ok) throw new Error(`Failed to load player: ${response.status}`);
   return response.json();
 }

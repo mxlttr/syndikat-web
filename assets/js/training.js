@@ -7,7 +7,7 @@ function formatDateGerman(date) {
 }
 
 async function loadStatus() {
-  const response = await fetch(`${API_URL}/training/status`);
+  const response = await fetch(`${API_URL}/training/status`, { credentials: 'include' });
   if (!response.ok) throw new Error('Failed to load training status');
   trainingStatus = await response.json();
   document.querySelector('[data-next-date]').textContent = formatDateGerman(trainingStatus.date);
@@ -17,7 +17,7 @@ async function loadParticipants() {
   const list = document.querySelector('[data-training-list]');
   if (!list) return;
   list.innerHTML = '';
-  const response = await fetch(`${API_URL}/training/participants?date=${encodeURIComponent(trainingStatus.date)}`);
+  const response = await fetch(`${API_URL}/training/participants?date=${encodeURIComponent(trainingStatus.date)}`, { credentials: 'include' });
   if (!response.ok) return console.error('Failed to load training participants');
   const { participants } = await response.json();
   if (!participants.length) return list.insertAdjacentHTML('afterbegin', '<p><em data-no-participants>Bisher noch keine Anmeldungen. Sei der/die erste!</em></p>');
@@ -43,7 +43,7 @@ function setRemovalToken(participant, removalToken) {
 async function handleDelete(participant) {
   const signup = JSON.parse(window.localStorage.getItem('training-signup'));
   if (!signup?.removalToken || signup.id !== participant.id) return;
-  const response = await fetch(`${API_URL}/training/participants/${participant.id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${signup.removalToken}` } });
+  const response = await fetch(`${API_URL}/training/participants/${participant.id}`, { method: 'DELETE', credentials: 'include', headers: { Authorization: `Bearer ${signup.removalToken}` } });
   if (!response.ok) return console.error(`Failed to delete participant ${participant.name}`);
   window.localStorage.removeItem('training-signup');
   loadParticipants();
@@ -52,7 +52,7 @@ async function handleDelete(participant) {
 async function sendData(form) {
   const formData = new FormData(form);
   const response = await fetch(`${API_URL}/training/participants`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: formData.get('name'), password: formData.get('password') }),
   });
   const result = await response.json();

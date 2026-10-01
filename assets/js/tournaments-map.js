@@ -59,7 +59,7 @@ if (ui.originInput) {
 async function getTournaments(type) {
   try {
     const url = endpoints[type];
-    const response = await fetch(url);
+    const response = await fetch(url, { credentials: 'include' });
     return await response.json();
   } catch (error) {
     console.error(error);
@@ -243,6 +243,7 @@ async function handleRouteSubmit(event) {
   try {
     const response = await fetch(endpoints.route, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json"
       },

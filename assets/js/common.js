@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const onTourTableWrapper = document.querySelector('[data-on-tour-table-wrapper]');
     if (!onTourBody || !onTourStatus || !onTourTableWrapper) return;
 
-    fetch(`${resolveApiBaseUrl()}/tournaments/on-tour`)
+    fetch(`${resolveApiBaseUrl()}/tournaments/on-tour`, { credentials: 'include' })
       .then(async response => {
         if (!response.ok) throw new Error(`On-tour request failed with ${response.status}`);
         const data = await response.json();

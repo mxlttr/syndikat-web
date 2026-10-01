@@ -50,7 +50,7 @@ async function initRatings() {
 
   try {
     // Keep the full list here; club-specific views can use /ratings/${encodeURIComponent(club)}.
-    const response = await fetch(`${API_URL}/ratings`);
+    const response = await fetch(`${API_URL}/ratings`, { credentials: 'include' });
     if (!response.ok) throw new Error(`Failed to load ratings: ${response.status}`);
     const ratings = await response.json();
     if (!Array.isArray(ratings)) throw new Error('Ratings response is not an array');
