@@ -20,6 +20,7 @@
   let totalPlayers = 0;
   let divisions = [];
   let searchTimer;
+  let previousBodyOverflow = null;
   const dateFormatter = new Intl.DateTimeFormat("de-DE", {
     year: "numeric",
     month: "2-digit",
@@ -109,8 +110,19 @@
     return () => {
       ratingsController?.abort();
       window.removeEventListener("keydown", handleKeydown);
+      document.body.style.overflow = previousBodyOverflow;
     };
   });
+
+  $: if (typeof document !== "undefined") {
+    if (selectedPlayer && previousBodyOverflow === null) {
+      previousBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    } else if (!selectedPlayer && previousBodyOverflow !== null) {
+      document.body.style.overflow = previousBodyOverflow;
+      previousBodyOverflow = null;
+    }
+  }
 
   $: totalPages = Math.max(1, Math.ceil(totalPlayers / pageSize));
 
