@@ -32,14 +32,6 @@
     }
   }
 
-  function trackRatingsSearch() {
-    trackEvent("ratings_search", { query: search });
-  }
-
-  function trackRatingsFilter(type, value) {
-    trackEvent("ratings_filter", { filter: type, value });
-  }
-
   function trackExternalLink(destination) {
     trackEvent("ratings_external_link_click", { destination });
   }
@@ -96,12 +88,10 @@
         totalPlayers = result.total;
         divisions = result.divisions;
         currentPage = requestedPage;
-        trackEvent("ratings_loaded", { resultCount: result.total });
       })
       .catch((err) => {
         if (err.name !== "AbortError") {
           error = true;
-          trackEvent("ratings_load_error");
         }
       })
       .finally(() => {
@@ -128,7 +118,6 @@
     const key = `${search}|${division}|${club}`;
     if (key !== noResultsEventKey) {
       noResultsEventKey = key;
-      trackEvent("ratings_no_results", { query: search, division, club });
     }
   }
 
@@ -205,7 +194,6 @@
       placeholder="Spieler/Verein suchen..."
       bind:value={search}
       on:input={searchPlayers}
-      on:change={trackRatingsSearch}
       disabled={error || (loading && players.length === 0)}
     />
   </div>
@@ -216,7 +204,6 @@
       bind:value={division}
       on:change={() => {
         search = "";
-        trackRatingsFilter("division", division);
         syncFilterUrl();
         loadRatings(1);
       }}
@@ -231,7 +218,6 @@
       bind:value={club}
       on:change={() => {
         search = "";
-        trackRatingsFilter("club", club);
         syncFilterUrl();
         loadRatings(1);
       }}

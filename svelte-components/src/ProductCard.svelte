@@ -45,7 +45,7 @@
   $: cleanProductUrl = productUrl
     ? productUrl.origin + productUrl.pathname
     : "";
-  $: productHref = cleanProductUrl ? `${cleanProductUrl}?ref=syndikat.golf` : null;
+  $: productHref = product?.url || null;
   let isWishlisted = false;
   $: {
     wishlist.subscribe((products) => {
@@ -70,21 +70,6 @@
     ? EURO.format(product.price / 100)
     : "Preis unbekannt";
 
-  const trackEvent = (eventName, props) => {
-    if (window.umami) window.umami.track(eventName, props);
-  };
-
-  const trackProduct = (product) => {
-    if (!productHref) return;
-    trackEvent("product_click", {
-      product: product.title,
-      store: product.store,
-      price: product.price / 100,
-      currency: "EUR",
-      url: product.url,
-    });
-  };
-
   const toggleWishlist = () => {
     wishlist.update((items) => {
       if (isWishlisted) {
@@ -107,7 +92,6 @@
         rel="noopener noreferrer"
         target="_blank"
         class="article__image"
-        on:click={trackProduct(product)}
       >
         {#if product.flightNumbers}
           <ul class="article__flight-numbers">
@@ -159,7 +143,7 @@
           href={productHref}
           rel="noopener noreferrer"
           target="_blank"
-          on:click={trackProduct(product)}>{product.title}</a
+          >{product.title}</a
         >
       </h2>
       <p>

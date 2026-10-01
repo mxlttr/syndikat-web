@@ -24,6 +24,13 @@ noindex: true
   document.addEventListener('DOMContentLoaded', () => {
     const inputs = document.querySelectorAll('[data-tracking-form] input');
     const storedPreference = localStorage.getItem('umami.disabled') === '1';
+    const isSyndikatHost = location.hostname === 'syndikat.golf' || location.hostname.endsWith('.syndikat.golf');
+    const cookieDomain = isSyndikatHost ? '; Domain=.syndikat.golf' : '';
+    const setCookie = disabled => {
+      const value = disabled ? '1' : '0';
+      document.cookie = `syndikat_analytics_disabled=${value}; Path=/; Max-Age=${disabled ? 31536000 : 0}; SameSite=Lax${cookieDomain}${location.protocol === 'https:' ? '; Secure' : ''}`;
+    };
+    setCookie(storedPreference);
 
     inputs.forEach(input => {
       input.checked = (input.value === 'true') === storedPreference;
@@ -31,10 +38,12 @@ noindex: true
         const isTrackingDisabled = event.target.value === 'true';
         if (isTrackingDisabled) {
           localStorage.setItem('umami.disabled', '1');
+          setCookie(true);
           return;
         }
 
         localStorage.removeItem('umami.disabled');
+        setCookie(false);
       });
     });
   });

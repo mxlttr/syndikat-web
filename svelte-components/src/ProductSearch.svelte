@@ -52,10 +52,6 @@
     searchInputElement?.focus();
   };
 
-  const trackEvent = (eventName, props) => {
-    if (window.umami) window.umami.track(eventName, props);
-  };
-
   const closeActiveSource = () => {
     if (activeSource) {
       activeSource.close();
@@ -131,10 +127,6 @@
     closeActiveSource();
     const currentRun = ++searchRun;
 
-    trackEvent("product_search", {
-      query: normalizedQuery,
-    });
-
     initialProducts = [];
     defaultState = false;
     searchedQuery = normalizedQuery;
@@ -164,16 +156,6 @@
       onEnd: () => {
         if (currentRun !== searchRun) return;
         shopCount = totalStores;
-        const productCount = initialProducts.length;
-        trackEvent("product_search_completed", {
-          query: normalizedQuery,
-          product_count: productCount,
-        });
-        if (productCount === 0) {
-          trackEvent("product_search_no_results", {
-            query: normalizedQuery,
-          });
-        }
         finishSearch();
       },
       onServerError: () => {

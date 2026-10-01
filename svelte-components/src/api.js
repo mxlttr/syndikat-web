@@ -23,6 +23,7 @@ export function streamProducts(query, callbacks = {}) {
 
   const source = new EventSource(
     `${API_URL}/products/search-stream/${encodeURIComponent(query)}`,
+    { withCredentials: true },
   );
 
   const parseEventData = (event) => {
