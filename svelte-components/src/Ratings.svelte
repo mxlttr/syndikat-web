@@ -462,14 +462,14 @@
   .rating-player-row:hover, .rating-player-row:focus-visible { background: var(--background-alt-color, rgb(0 0 0 / 5%)); outline: none; }
   :global(#ratings .rating-player-row:hover > td), :global(#ratings .rating-player-row:focus-visible > td) { background: var(--background-alt-color, rgb(0 0 0 / 5%)); }
   .ranking-name-link { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .rating-modal { position: relative; width: min(42rem, 100%); max-height: 90vh; overflow: auto; padding: 2rem; border-radius: 1rem; background: var(--background-color, #fff); color: var(--text-color, #222); box-shadow: 0 1rem 3rem rgb(0 0 0 / 30%); }
+  .rating-modal { position: relative; display: flex; flex-direction: column; width: min(42rem, 100%); height: min(90vh, 56rem); overflow: hidden; padding: 2rem; border-radius: 1rem; background: var(--background-color, #fff); color: var(--text-color, #222); box-shadow: 0 1rem 3rem rgb(0 0 0 / 30%); }
   .rating-modal__close { position: absolute; top: .5rem; right: .75rem; border: 0; background: transparent; color: inherit; -webkit-appearance: none; appearance: none; -webkit-text-fill-color: currentColor; font-size: 2rem; cursor: pointer; }
-  .rating-modal__hero { display: flex; align-items: center; gap: 1rem; padding-bottom: 1.5rem; }
+  .rating-modal__hero { display: flex; flex: 0 0 auto; align-items: center; gap: 1rem; padding-bottom: 1.5rem; }
   .rating-modal__avatar { display: grid; width: 4.5rem; height: 4.5rem; place-items: center; border-radius: 50%; color: #fff; font-size: 1.35rem; font-weight: 700; }
   .rating-modal__eyebrow { margin: 0; color: var(--brand-color, #4f46e5); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
   .rating-modal h2 { margin: .15rem 0; }
   .rating-modal__club, .rating-modal__muted { margin: 0; color: rgb(0 0 0 / 60%); }
-  .rating-modal__content { min-height: 34rem; }
+  .rating-modal__content { min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; }
   .rating-modal__content--state { display: flex; min-height: 34rem; align-items: center; justify-content: center; }
   .rating-modal__stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: .75rem; margin: 0 0 1.5rem; }
   .rating-modal__stats div { padding: .85rem; border-radius: .65rem; background: rgb(0 0 0 / 5%); }
