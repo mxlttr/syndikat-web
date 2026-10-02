@@ -469,6 +469,7 @@
 {/if}
 
 <style>
+  :global(body:has(dialog:modal)) { overflow: hidden; }
   .rating-player-row { cursor: pointer; }
   .rating-player-row:hover, .rating-player-row:focus-visible { background: var(--background-alt-color, rgb(0 0 0 / 5%)); outline: none; }
   :global(#ratings .rating-player-row:hover > td), :global(#ratings .rating-player-row:focus-visible > td) { background: var(--background-alt-color, rgb(0 0 0 / 5%)); }
