@@ -20,7 +20,6 @@
   let totalPlayers = 0;
   let divisions = [];
   let searchTimer;
-  let previousBodyOverflow = null;
   const dateFormatter = new Intl.DateTimeFormat("de-DE", {
     year: "numeric",
     month: "2-digit",
@@ -102,26 +101,19 @@
 
   onMount(() => {
     restoreFiltersFromUrl();
-    const handleKeydown = (event) => {
-      if (event.key === "Escape" && selectedPlayer) closePlayer();
-    };
-    window.addEventListener("keydown", handleKeydown);
     loadRatings();
     return () => {
       ratingsController?.abort();
-      window.removeEventListener("keydown", handleKeydown);
-      document.body.style.overflow = previousBodyOverflow;
     };
   });
 
-  $: if (typeof document !== "undefined") {
-    if (selectedPlayer && previousBodyOverflow === null) {
-      previousBodyOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-    } else if (!selectedPlayer && previousBodyOverflow !== null) {
-      document.body.style.overflow = previousBodyOverflow;
-      previousBodyOverflow = null;
-    }
+  function showModal(node) {
+    node.showModal();
+    return {
+      destroy() {
+        if (node.open) node.close();
+      },
+    };
   }
 
   $: totalPages = Math.max(1, Math.ceil(totalPlayers / pageSize));
@@ -194,6 +186,17 @@
 
   function closePlayer() {
     selectedPlayer = null;
+  }
+
+  function handleDialogKeydown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePlayer();
+    }
+  }
+
+  function handleDialogClick(event) {
+    if (event.target === event.currentTarget) closePlayer();
   }
 
   function openPlayer(player) {
@@ -407,9 +410,7 @@
 {/if}
 
 {#if selectedPlayer}
-  <div class="rating-modal-backdrop" role="presentation" on:click={closePlayer}>
-
-    <section class="rating-modal" role="dialog" aria-modal="true" aria-labelledby="player-modal-title" on:click|stopPropagation on:keypress|stopPropagation>
+  <dialog class="rating-modal" aria-labelledby="player-modal-title" use:showModal on:click={handleDialogClick} on:keydown={handleDialogKeydown} on:close={closePlayer}>
       <button class="rating-modal__close" aria-label="Dialog schließen" on:click={closePlayer}>×</button>
       <header class="rating-modal__hero">
         <div class="rating-modal__avatar" style={`background-color: ${avatarColorForName(selectedPlayer.name)}`}>{initials(selectedPlayer.name)}</div>
@@ -464,17 +465,16 @@
         {:else}<p>Keine Turnierdaten vorhanden.</p>{/if}
         {/if}
       </div>
-    </section>
-  </div>
+  </dialog>
 {/if}
 
 <style>
-  .rating-modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; background: rgb(0 0 0 / 55%); }
   .rating-player-row { cursor: pointer; }
   .rating-player-row:hover, .rating-player-row:focus-visible { background: var(--background-alt-color, rgb(0 0 0 / 5%)); outline: none; }
   :global(#ratings .rating-player-row:hover > td), :global(#ratings .rating-player-row:focus-visible > td) { background: var(--background-alt-color, rgb(0 0 0 / 5%)); }
   .ranking-name-link { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .rating-modal { position: relative; display: flex; flex-direction: column; width: min(42rem, 100%); height: min(90vh, 56rem); overflow: hidden; padding: 2rem; border-radius: 1rem; background: var(--background-color, #fff); color: var(--text-color, #222); box-shadow: 0 1rem 3rem rgb(0 0 0 / 30%); }
+  .rating-modal { position: fixed; inset: 0; display: flex; box-sizing: border-box; flex-direction: column; width: min(42rem, calc(100% - 2rem)); height: min(90vh, 56rem); max-width: none; max-height: none; overflow: hidden; margin: auto; padding: 2rem; border: 0; border-radius: 1rem; background: var(--background-color, #fff); color: var(--text-color, #222); box-shadow: 0 1rem 3rem rgb(0 0 0 / 30%); }
+  .rating-modal::backdrop { background: rgb(0 0 0 / 55%); }
   .rating-modal__close { position: absolute; top: .5rem; right: .75rem; border: 0; background: transparent; color: inherit; -webkit-appearance: none; appearance: none; -webkit-text-fill-color: currentColor; font-size: 2rem; cursor: pointer; }
   .rating-modal__hero { display: flex; flex: 0 0 auto; align-items: center; gap: 1rem; padding-bottom: 1.5rem; }
   .rating-modal__avatar { display: grid; width: 4.5rem; height: 4.5rem; place-items: center; border-radius: 50%; color: #fff; font-size: 1.35rem; font-weight: 700; }
