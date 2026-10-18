@@ -19,7 +19,7 @@ Für das Herbstfest kam ein eigenes Layout mit 13 Bahnen zum Einsatz, darunter v
 
 ## Ehrung der Sommersieger*innen
 
-Bei der Ehrung standen die Sieger\*innen der Sommersaison unserer [Syndication Weekly](https://udisc.com/leagues/syndication-weekly-offene-liga-koeln-dkb2vB/standings?seasonId=season_iepthr6ch9ojdfly7avrpztn&division=GEN) im Mittelpunkt. Der Rückblick auf die Leistungen der vergangenen Monate gab der Liga-Saison einen festlichen Schlusspunkt. Ein herzliches Dankeschön an [Thrownature](https://thrownatur-discgolf.de/), die mit ihrer Unterstützung die Preise für die Siegerehrung ermöglicht haben. Ein Dankeschön auch an das Sportamt im Bezirk Nippes, dass wir die Anlage nutzen dürfen, und an den Platzwart, der alles super vorbereitet hat.
+Bei der Ehrung standen die Sieger\*innen der Sommersaison unserer [Syndication Weekly](https://udisc.com/leagues/syndication-weekly-offene-liga-koeln-dkb2vB/standings?seasonId=season_iepthr6ch9ojdfly7avrpztn&division=GEN) im Mittelpunkt. Der Rückblick auf die Leistungen der vergangenen Monate gab der Liga-Saison einen festlichen Schlusspunkt. Ein herzliches Dankeschön an [Thrownature](https://thrownatur-discgolf.de/), die mit ihrer Unterstützung die Preise für die Siegerehrung ermöglicht haben. Ein Dankeschön auch an das Sportamt der Stadt Köln, dass wir die Anlage nutzen dürfen, und an den Platzwart, der alles super vorbereitet hat.
 
 ![Drei Teilnehmende bei der Ehrung der Sommersieger*innen](/assets/images/posts/herbstfest-2026-ehrung.jpg)
 
