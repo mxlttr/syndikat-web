@@ -19,7 +19,7 @@ The autumn festival used its own 13-hole layout, including four new holes. This 
 
 ## Honouring the summer winners
 
-The awards focused on the winners of the summer season of our [Syndication Weekly](https://udisc.com/leagues/syndication-weekly-offene-liga-koeln-dkb2vB/standings?seasonId=season_iepthr6ch9ojdfly7avrpztn&division=GEN). Looking back at the achievements of the past months gave the league season a festive finish. A big thank you to [Thrownature](https://thrownatur-discgolf.de/), whose support made the prizes for the award ceremony possible.
+The awards focused on the winners of the summer season of our [Syndication Weekly](https://udisc.com/leagues/syndication-weekly-offene-liga-koeln-dkb2vB/standings?seasonId=season_iepthr6ch9ojdfly7avrpztn&division=GEN). Looking back at the achievements of the past months gave the league season a festive finish. A big thank you to [Thrownature](https://thrownatur-discgolf.de/), whose support made the prizes for the award ceremony possible. Thanks also to the sports office of the Nippes district for letting us use the course, and to the groundskeeper, who prepared everything superbly.
 
 ![Three participants at the summer winners' award ceremony](/assets/images/posts/herbstfest-2026-ehrung.jpg)
 
@@ -39,7 +39,7 @@ The day showed its autumnal side: it was cool, but there were also spells of bri
 
 ## Results from two rounds
 
-In MPO, Nils Teckenberg won with −9. Erik Steup and Elmar Bode shared second place with −7 each. The FPO division was won by Sarah Ziegler with −3. Full scores and standings are available on UDisc for [round 1](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=1) and [round 2](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=2).
+In MPO, Nils Teckenberg won with −5. Erik Steup and Elmar Bode shared second place with −3 each. The FPO division was won by Sarah Ziegler with +1. Full scores and standings are available on UDisc for [round 1](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=1) and [round 2](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=2).
 
 ![FPO award ceremony at the autumn festival](/assets/images/posts/herbstfest-2026-fpo-ehrung.jpg)
 
