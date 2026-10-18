@@ -19,7 +19,7 @@ Für das Herbstfest kam ein eigenes Layout mit 13 Bahnen zum Einsatz, darunter v
 
 ## Ehrung der Sommersieger*innen
 
-Bei der Ehrung standen die Sieger\*innen der Sommersaison unserer [Syndication Weekly](https://udisc.com/leagues/syndication-weekly-offene-liga-koeln-dkb2vB/standings?seasonId=season_iepthr6ch9ojdfly7avrpztn&division=GEN) im Mittelpunkt. Der Rückblick auf die Leistungen der vergangenen Monate gab der Liga-Saison einen festlichen Schlusspunkt.
+Bei der Ehrung standen die Sieger\*innen der Sommersaison unserer [Syndication Weekly](https://udisc.com/leagues/syndication-weekly-offene-liga-koeln-dkb2vB/standings?seasonId=season_iepthr6ch9ojdfly7avrpztn&division=GEN) im Mittelpunkt. Der Rückblick auf die Leistungen der vergangenen Monate gab der Liga-Saison einen festlichen Schlusspunkt. Ein herzliches Dankeschön an [Thrownature](https://thrownatur-discgolf.de/), die mit ihrer Unterstützung die Preise für die Siegerehrung ermöglicht haben. Ein Dankeschön auch an das Sportamt im Bezirk Nippes, dass wir die Anlage nutzen dürfen, und an den Platzwart, der alles super vorbereitet hat.
 
 ![Drei Teilnehmende bei der Ehrung der Sommersieger*innen](/assets/images/posts/herbstfest-2026-ehrung.jpg)
 
@@ -39,7 +39,7 @@ Der Tag zeigte sich von seiner herbstlichen Seite: Es war kühl, zwischendurch l
 
 ## Ergebnisse aus zwei Runden
 
-In der MPO gewann Nils Teckenberg mit −9. Erik Steup und Elmar Bode teilten sich mit je −7 den zweiten Platz. Die FPO-Wertung entschied Sarah Ziegler mit −3 für sich. Die vollständigen Scores und Platzierungen gibt es bei UDisc für [Runde 1](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=1) und [Runde 2](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=2).
+In der MPO gewann Nils Teckenberg mit −5. Erik Steup und Elmar Bode teilten sich mit je −3 den zweiten Platz. Die FPO-Wertung entschied Sarah Ziegler mit +1 für sich. Die vollständigen Scores und Platzierungen gibt es bei UDisc für [Runde 1](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=1) und [Runde 2](https://udisc.com/events/herbstfest-26-HcmQu5/leaderboard?round=2).
 
 ![Siegerehrung der FPO-Wertung beim Herbstfest](/assets/images/posts/herbstfest-2026-fpo-ehrung.jpg)
 
