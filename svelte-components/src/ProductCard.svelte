@@ -1,4 +1,5 @@
 <script>
+  import { l, locale } from "./i18n.js";
   import Icon from "./Icon.svelte";
   import { shops } from "./shopData.js";
   import tippy from "tippy.js";
@@ -56,19 +57,26 @@
   }
 
   $: shop = shops.find((shop) => shop.handle === product?.store);
-  const stockStatusLabels = {
-    available: "Auf Lager",
-    unavailable: "Nicht auf Lager",
-    unknown: "Unbekannt",
-  };
+  const stockStatusLabels = l({
+    de: {
+      available: "Auf Lager",
+      unavailable: "Nicht auf Lager",
+      unknown: "Unbekannt",
+    },
+    en: {
+      available: "In stock",
+      unavailable: "Out of stock",
+      unknown: "Unknown",
+    },
+  });
 
-  const EURO = new Intl.NumberFormat("de-DE", {
+  const EURO = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
   });
   $: productPrice = typeof product?.price === "number"
     ? EURO.format(product.price / 100)
-    : "Preis unbekannt";
+    : l({ de: "Preis unbekannt", en: "Price unknown" });
 
   const toggleWishlist = () => {
     wishlist.update((items) => {
@@ -115,7 +123,7 @@
         class="tooltip tooltip--wishlist"
         on:click={toggleWishlist}
         use:tooltip={{
-          content: `Zur Wunschliste hinzufügen`,
+          content: l({ de: "Zur Wunschliste hinzufügen", en: "Add to wishlist" }),
           placement: "left",
           offset: [0, 0],
           zIndex: 1,
