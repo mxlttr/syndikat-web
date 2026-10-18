@@ -75,7 +75,7 @@
 - id: terms
   title: Statutes
   label: I accept the statutes of Disc Golf Syndikat e.V.
-  text: "You can find the statutes <a href=\"/en/satzung/\">here</a>"
+  text: "You can find the statutes <a href=\"/satzung/\">here</a> (in German)"
   type: checkbox
   required: true
 - id: disclaimer
@@ -87,6 +87,6 @@
 - id: privacy
   title: Consent to data processing
   label: I have read the privacy policy and consent to the use of my data
-  text: "I agree that my personal data (name, address, date of birth, email address) may be used by Disc Golf Syndikat e.V. to send me information about the club. My personal data will never be passed on to third parties without a legal basis. Our club is obliged to pass on the following member data to the German Frisbee Sport Association (DFV): name, date of birth, date of joining. I agree to this transfer within the scope of the club's purpose. I am aware that I can revoke this consent at any time by informing Disc Golf Syndikat e.V. in writing. Privacy notice: The data is processed by Disc Golf Syndikat e.V. in accordance with the following privacy information: <a href=\"/en/datenschutz/\">Privacy</a>."
+  text: "I agree that my personal data (name, address, date of birth, email address) may be used by Disc Golf Syndikat e.V. to send me information about the club. My personal data will never be passed on to third parties without a legal basis. Our club is obliged to pass on the following member data to the German Frisbee Sport Association (DFV): name, date of birth, date of joining. I agree to this transfer within the scope of the club's purpose. I am aware that I can revoke this consent at any time by informing Disc Golf Syndikat e.V. in writing. Privacy notice: The data is processed by Disc Golf Syndikat e.V. in accordance with the following privacy information: <a href=\"/datenschutz/\">Datenschutz</a> (in German)."
   type: checkbox
   required: true
