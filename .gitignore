@@ -4,7 +4,6 @@ _site/
 .jekyll-metadata
 .DS_Store
 node_modules/
-assets/svelte-bundle*
-assets/sentry-bundle*
+assets/*-bundle*
 assets/css/style.min.css
 editorial/*

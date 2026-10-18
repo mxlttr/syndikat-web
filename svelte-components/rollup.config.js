@@ -28,13 +28,13 @@ const sharedOutput = {
 	format: 'iife',
 };
 
-export default [
-	{
-		input: path.resolve(__dirname, 'src/main.js'),
+function svelteBundle(entry, globalName, bundleName) {
+	return {
+		input: path.resolve(__dirname, `src/${entry}`),
 		output: {
 			...sharedOutput,
-			name: 'app',
-			file: assetPath('svelte-bundle.js'),
+			name: globalName,
+			file: assetPath(`${bundleName}-bundle.js`),
 			globals: {
 				'tippy.js': 'tippy'
 			}
@@ -47,7 +47,7 @@ export default [
 					dev: !production
 				}
 			}),
-			css({ output: 'svelte-bundle.css' }),
+			css({ output: `${bundleName}-bundle.css` }),
 			resolve({
 				browser: true,
 				dedupe: ['svelte'],
@@ -60,7 +60,12 @@ export default [
 		watch: {
 			clearScreen: false
 		}
-	},
+	};
+}
+
+export default [
+	svelteBundle('product-search.js', 'productSearch', 'product-search'),
+	svelteBundle('ratings.js', 'ratings', 'ratings'),
 	{
 		input: path.resolve(__dirname, 'src/sentry.js'),
 		output: {
