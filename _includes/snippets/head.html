@@ -125,8 +125,9 @@
   {%- for translation in page.translations %}
   <link rel="alternate" hreflang="{{ translation[0] }}" href="{{ translation[1] | absolute_url }}">
   {%- endfor %}
-  {%- if page.translations[site.languages[0]] %}
-  <link rel="alternate" hreflang="x-default" href="{{ page.translations[site.languages[0]] | absolute_url }}">
+  {%- assign default_lang = site.languages | first -%}
+  {%- if page.translations[default_lang] %}
+  <link rel="alternate" hreflang="x-default" href="{{ page.translations[default_lang] | absolute_url }}">
   {%- endif %}
   {%- endif %}
   <meta name="twitter:card" content="summary_large_image">

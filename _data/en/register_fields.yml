@@ -1,0 +1,92 @@
+# Field ids must match the German file so Netlify form submissions stay consistent.
+- id: personal_info
+  title: Personal details
+  type: section
+- id: email
+  title: Email
+  type: email
+  required: true
+- id: name
+  title: First and last name
+  type: text
+  required: true
+- id: address
+  title: Street and house number
+  type: address
+  required: true
+- id: zip
+  title: Postcode
+  type: text
+  required: true
+- id: city
+  title: City
+  type: text
+  required: true
+- id: phone
+  title: Phone number
+  type: tel
+- id: birthday
+  title: Date of birth
+  type: text
+  placeholder: DD.MM.YYYY
+  required: true
+- id: dfv-number
+  title: DFV number available
+  type: radio
+  tooltip: If you are or were already registered with another club (disc golf, ultimate, etc.), please send us your current DFV number so that we can transfer your registration.
+  options:
+    - label: Yes, I already have a DFV number
+      value: true
+    - label: No, I don't have a DFV number yet
+      value: false
+  required: true
+- id: payment_info
+  title: Payment information
+  type: section
+- id: membership-type
+  title: Type of membership
+  type: radio
+  options:
+    - label: Active member
+      value: true
+    - label: Supporting member
+      value: false
+  required: true
+- id: reduction
+  title: Reduction
+  label: I am eligible for a reduced fee
+  type: checkbox
+  tooltip: "Pupils, job seekers and pensioners pay a reduced fee. Corresponding proof must be provided."
+- id: iban
+  title: IBAN
+  type: text
+  required: true
+- id: account-owner
+  title: Account holder
+  type: text
+  required: true
+- id: sepa-mandate
+  type: info
+  title: SEPA mandate
+  text: "By submitting this registration form, I authorise you to collect payments from my account by direct debit. At the same time, I instruct my bank to honour the direct debits drawn on my account by Disc Golf Syndikat e.V. Note: I can request a refund of the debited amount within eight weeks, starting from the date of debit. The conditions agreed with my bank apply."
+- id: legal
+  title: Legal
+  type: section
+- id: terms
+  title: Statutes
+  label: I accept the statutes of Disc Golf Syndikat e.V.
+  text: "You can find the statutes <a href=\"/en/satzung/\">here</a>"
+  type: checkbox
+  required: true
+- id: disclaimer
+  title: Cancellation policy
+  label: I have read and acknowledged the cancellation policy
+  text: "I hereby revocably authorise you to collect the membership fee payments due from me by direct debit from the next possible date when they fall due. If my account does not have sufficient funds, the account-holding bank is under no obligation to honour the debit. Partial payments are not made in the direct debit procedure."
+  type: checkbox
+  required: true
+- id: privacy
+  title: Consent to data processing
+  label: I have read the privacy policy and consent to the use of my data
+  text: "I agree that my personal data (name, address, date of birth, email address) may be used by Disc Golf Syndikat e.V. to send me information about the club. My personal data will never be passed on to third parties without a legal basis. Our club is obliged to pass on the following member data to the German Frisbee Sport Association (DFV): name, date of birth, date of joining. I agree to this transfer within the scope of the club's purpose. I am aware that I can revoke this consent at any time by informing Disc Golf Syndikat e.V. in writing. Privacy notice: The data is processed by Disc Golf Syndikat e.V. in accordance with the following privacy information: <a href=\"/en/datenschutz/\">Privacy</a>."
+  type: checkbox
+  required: true

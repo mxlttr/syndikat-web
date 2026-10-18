@@ -125,13 +125,15 @@
       ]
     }
     {%- elsif page.layout == "author" -%}
-      {%- assign author = site.data.authors[page.author_id] -%},
+      {%- assign author = site.data.authors[page.author_id] -%}
+      {%- assign author_bio = author.bio -%}
+      {%- if page.lang != site.languages[0] and author.bio_en -%}{%- assign author_bio = author.bio_en -%}{%- endif -%},
     {
       "@type": "ProfilePage",
       "@id": {{ page_url | jsonify }},
       "url": {{ page_url | jsonify }},
       "name": {{ author.name | jsonify }},
-      "description": {{ author.bio | default: meta_description | jsonify }},
+      "description": {{ author_bio | default: meta_description | jsonify }},
       "isPartOf": {
         "@id": {{ website_id | jsonify }}
       },
@@ -150,8 +152,8 @@
       {%- if author.image -%},
       "image": {{ author.image | absolute_url | jsonify }}
       {%- endif -%}
-      {%- if author.bio -%},
-      "description": {{ author.bio | jsonify }}
+      {%- if author_bio -%},
+      "description": {{ author_bio | jsonify }}
       {%- endif -%}
       {%- if author.same_as -%},
       "sameAs": [
@@ -163,7 +165,7 @@
     }
     {%- else -%},
     {
-      "@type": "{%- if page.layout == "index" -%}CollectionPage{%- elsif page.url == "/about/" -%}AboutPage{%- elsif page.url == "/contact/" -%}ContactPage{%- else -%}WebPage{%- endif -%}",
+      "@type": "{%- if page.layout == "index" -%}CollectionPage{%- elsif page.url == "/about/" or page.url == "/en/about/" -%}AboutPage{%- elsif page.url == "/contact/" or page.url == "/en/contact/" -%}ContactPage{%- else -%}WebPage{%- endif -%}",
       "@id": {{ page_url | jsonify }},
       "url": {{ page_url | jsonify }},
       "name": {{ page.title | default: site.title | jsonify }},

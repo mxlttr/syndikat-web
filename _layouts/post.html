@@ -66,7 +66,8 @@ layout: default
     {%- if page.ai_translated %}
     <aside class="post__notice" role="note">
       {{ 'post.ai_translation_notice' | t }}
-      {%- assign original_url = page.translations[site.languages[0]] -%}
+      {%- assign default_lang = site.languages | first -%}
+      {%- assign original_url = page.translations[default_lang] -%}
       {%- if original_url %} <a href="{{ original_url }}" lang="{{ site.languages[0] }}" hreflang="{{ site.languages[0] }}">{{ 'post.ai_translation_link' | t }}</a>{% endif %}
     </aside>
     {%- endif %}

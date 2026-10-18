@@ -1,0 +1,16 @@
+# Links are localized automatically (/blog/ -> /en/blog/).
+items:
+  - label: Blog
+    link: /blog/
+  - label: Contact
+    link: /contact/
+  - label: Statutes
+    link: /satzung/
+  - label: FAQs
+    link: /faq/
+  - label: Ratings
+    link: /ratings/
+  - label: Privacy
+    link: /datenschutz/
+  - label: Legal notice
+    link: /impressum/

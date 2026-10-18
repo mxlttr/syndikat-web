@@ -1,0 +1,29 @@
+- title: "Reduced"
+  description: "Reduced membership as an active player"
+  tooltip: "Reduced membership for pupils, students under 27, pensioners, unemployed people and people with disabilities. A copy of the corresponding proof must be provided."
+  periods:
+    - name: yearly
+      price: "24"
+      link: "https://buy.stripe.com/fZeg2T8q71140XS6or"
+    - name: monthly
+      price: null
+- title: "Standard"
+  description: "Standard membership as an active player"
+  periods:
+    - name: yearly
+      price: "30"
+      featured: true
+      link: "https://buy.stripe.com/5kA7wn6hZ114cGA8wA"
+    - name: monthly
+      price: null
+- title: "Supporter"
+  description: "Supporting membership as a passive supporter"
+  tooltip: "Supporting members support the club financially but are not actively involved in the club. They have no voting rights and cannot take part in elections."
+  periods:
+    - name: yearly
+      price: "50"
+      link: "https://buy.stripe.com/dR617ZeOv1148qk146"
+    - name: monthly
+      price: "5"
+      featured: true
+      link: "https://buy.stripe.com/7sI3g7dKrbFI21W3cd"
