@@ -11,12 +11,14 @@
 {%- capture meta_description_raw -%}
   {%- if page.description -%}
     {{- page.description | strip_html | strip_newlines | strip -}}
+  {%- elsif page.layout == "author" and page.lang != site.languages[0] and site.data.authors[page.author_id].bio_en -%}
+    {{- site.data.authors[page.author_id].bio_en | strip_html | strip_newlines | strip -}}
   {%- elsif page.layout == "author" and site.data.authors[page.author_id].bio -%}
     {{- site.data.authors[page.author_id].bio | strip_html | strip_newlines | strip -}}
   {%- elsif page.excerpt -%}
     {{- page.excerpt | strip_html | strip_newlines | strip -}}
   {%- else -%}
-    {{- site.description | strip_html | strip_newlines | strip -}}
+    {{- 'site_description' | t: fallback: site.description | strip_html | strip_newlines | strip -}}
   {%- endif -%}
 {%- endcapture -%}
 {%- assign meta_description = meta_description_raw | strip | truncate: 157, "..." -%}
@@ -118,7 +120,15 @@
   <link rel="preload" href="{{ '/assets/fonts/Jost-900-Black.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ '/assets/fonts/Jost-400-Book.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
   <link rel="canonical" href="{{ page.url | absolute_url }}">
-  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | relative_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | localize_url | relative_url }}">
+  {%- if page.translations.size > 1 %}
+  {%- for translation in page.translations %}
+  <link rel="alternate" hreflang="{{ translation[0] }}" href="{{ translation[1] | absolute_url }}">
+  {%- endfor %}
+  {%- if page.translations[site.languages[0]] %}
+  <link rel="alternate" hreflang="x-default" href="{{ page.translations[site.languages[0]] | absolute_url }}">
+  {%- endif %}
+  {%- endif %}
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="{{- sharing_image -}}">
   <meta name="twitter:image:alt" content="{{ page.title | default: site.title | escape }}">
@@ -126,6 +136,13 @@
   <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
   <meta property="og:title" content="{% if page.title %}{{ page.title | escape }} &ndash; {% endif %}{{ site.title }}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta property="og:locale" content="{{ 'locale' | t }}">
+  {%- for translation in page.translations %}
+  {%- assign alternate_lang = translation[0] -%}
+  {%- if alternate_lang != page.lang %}
+  <meta property="og:locale:alternate" content="{{ site.data.i18n[alternate_lang].locale }}">
+  {%- endif %}
+  {%- endfor %}
   {% if page.noindex %}
   <meta name="robots" content="noindex">
   {% endif %}
@@ -140,14 +157,14 @@
   {% if page.layout == "post" %}
     {% if page.author %}
       {% assign post_author = site.data.authors[page.author] %}
-      <meta property="article:author" content="{{ post_author.url | absolute_url }}">
+      <meta property="article:author" content="{{ post_author.url | localize_url | absolute_url }}">
       {% if post_author.twitter %}
         <meta name="twitter:creator" content="@{{ post_author.twitter }}">
       {% endif %}
     {% elsif page.authors %}
       {% for author_id in page.authors %}
         {% assign post_author = site.data.authors[author_id] %}
-        <meta property="article:author" content="{{ post_author.url | absolute_url }}">
+        <meta property="article:author" content="{{ post_author.url | localize_url | absolute_url }}">
       {% endfor %}
       {% assign first_author_id = page.authors | first %}
       {% assign first_author = site.data.authors[first_author_id] %}
@@ -170,7 +187,8 @@
   {% include snippets/structured_data.html %}
   {% if page.layout == 'index' %}
   {%- assign hero_image = site.hero_image | default: "/assets/images/hero.jpg" -%}
-  {%- assign first_post = site.posts | first -%}
+  {%- assign index_posts = '' | localized_posts -%}
+  {%- assign first_post = index_posts | first -%}
   {%- capture first_post_image -%}
     {%- if first_post.thumbnail -%}
       {{- first_post.thumbnail -}}

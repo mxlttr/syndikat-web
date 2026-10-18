@@ -2,7 +2,8 @@
 layout: default
 ---
 {%- assign author = site.data.authors[page.author_id] -%}
-{%- assign author_posts = site.posts | where_exp: "post", "post.author == page.author_id or post.authors contains page.author_id" -%}
+{%- assign lang_posts = '' | localized_posts -%}
+{%- assign author_posts = lang_posts | where_exp: "post", "post.author == page.author_id or post.authors contains page.author_id" -%}
 
 <div class="page-head">
   <div class="container">
@@ -25,7 +26,9 @@ layout: default
         <img src="{{ author_image_cdn | strip }}" alt="{{ author.name | escape }}" width="160" height="160" data-original-src="{{ author.image }}">
       </p>
       {% endif %}
-      <p>{{ author.bio | default: "Autor bei syndikat.golf und Mitglied des Disc Golf Syndikat Koeln." }}</p>
+      <p>{%- assign author_bio = author.bio -%}{%- if page.lang != site.languages[0] and author.bio_en -%}{%- assign author_bio = author.bio_en -%}{%- endif -%}
+      {%- assign default_bio = 'author.default_bio' | t -%}
+      {{ author_bio | default: default_bio }}</p>
       {% if author.same_as %}
       <ul>
         {% for url in author.same_as %}
@@ -42,7 +45,7 @@ layout: default
   <div class="row animate">
     <div class="col col-12">
       <div class="section__head">
-        <h2 class="section__title">Artikel von {{ author.name }}</h2>
+        <h2 class="section__title">{{ 'author.posts_by' | t: name: author.name }}</h2>
       </div>
 
       <div class="row animate">

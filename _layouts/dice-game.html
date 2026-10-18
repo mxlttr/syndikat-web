@@ -18,13 +18,13 @@ layout: default
   <div class="page">
     <div class="page__content">
       <div class="dice-wrapper">
-        <p>Drück den Button und lass den Zufall entscheiden wie der nächste Wurf aussieht! Der erste Würfel gibt den Wurf an, der Zweite die Art der Scheibe. Viel Spaß beim Spielen!</p>
+        <p>{{ 'dice_game.intro' | t }}</p>
         <div class="dice">
           <div class="die">🎲</div>
           <div class="die">🎲</div>
         </div>
 
-        <button class="button button--primary" data-umami-event="dice_roll" data-roll-dice>Roll the dice</button>
+        <button class="button button--primary" data-umami-event="dice_roll" data-roll-dice>{{ 'dice_game.roll' | t }}</button>
       </div>
 
       <div>
