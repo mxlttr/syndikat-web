@@ -6,4 +6,5 @@ _site/
 node_modules/
 assets/*-bundle*
 assets/css/style.min.css
+_data/svelte_bundles.json
 editorial/*

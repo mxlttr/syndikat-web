@@ -199,13 +199,13 @@
   <script src="{{ '/assets/sentry-bundle.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/scripts.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/common.js' | relative_url }}" defer></script>
-  {% if page.layout == 'product-search' %}
-  <script defer src="{{ '/assets/product-search-bundle.js' | relative_url }}"></script>
-  <link href="{{ '/assets/product-search-bundle.css' | relative_url }}" rel="stylesheet">
-  {% elsif page.layout == 'ratings' %}
-  <script defer src="{{ '/assets/ratings-bundle.js' | relative_url }}"></script>
-  <link href="{{ '/assets/ratings-bundle.css' | relative_url }}" rel="stylesheet">
-  {% endif %}
+  {% for svelte_bundle in site.data.svelte_bundles %}
+    {% if page.layout == svelte_bundle %}
+      {%- assign svelte_bundle_path = '/assets/' | append: svelte_bundle | append: '-bundle' -%}
+  <script defer src="{{ svelte_bundle_path | append: '.js' | relative_url }}"></script>
+  <link href="{{ svelte_bundle_path | append: '.css' | relative_url }}" rel="stylesheet">
+    {% endif %}
+  {% endfor %}
   {% if page.layout == 'dice-game' %}
   <script src="{{ '/assets/js/dice-game.js' | relative_url }}" defer></script>
   {% elsif page.layout == 'tournaments-map' %}

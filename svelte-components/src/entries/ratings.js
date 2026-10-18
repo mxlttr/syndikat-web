@@ -1,4 +1,4 @@
-import Ratings from './Ratings.svelte';
+import Ratings from '../Ratings.svelte';
 
 const target = document.querySelector('#ratings-app');
 
