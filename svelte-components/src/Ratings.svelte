@@ -75,7 +75,7 @@
     error = false;
     fetchRatings({
       signal: controller.signal,
-      club: club === "syndikat-only" ? "Syndikat" : club === "cologne-only" ? "Köln" : "",
+      club: club === "syndikat-only" ? "Syndikat" : club === "cologne-only" ? "Köln,Syndikat" : "",
       division,
       search,
       page: requestedPage,
