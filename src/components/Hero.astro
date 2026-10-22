@@ -1,0 +1,41 @@
+---
+import { site } from "../data/consts";
+import { Image } from "astro:assets";
+import BrandIcon from "./icons/BrandIcons.astro";
+import HeroImage from "../assets/images/hero.jpg";
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="row">
+      <div class="col col-12">
+        <div class="hero__inner">
+          <div class="hero__left">
+            <h1 class="hero__title">Hey, wir sind das Syndikat</h1>
+            <p class="hero__description">{site.description}</p>
+            <div class="hero__subscribe">
+              <button
+                class="button button--primary button--icon"
+                id="btn-discord"
+                data-umami-event="discord_click"
+                type="submit"
+                onclick="window.open('\/\/community.syndikat.golf');"
+              >
+                <BrandIcon name="discord" />
+                Discord beitreten
+              </button>
+              <a href="/register/" class="button" id="btn-membership" data-umami-event="member_click">
+                Mitglied werden
+              </a>
+            </div>
+          </div>
+          <div class="hero__right">
+            <div class="hero__image">
+              <Image src={HeroImage} alt="Syndikat Hero Image" width={600} height={450} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

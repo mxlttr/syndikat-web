@@ -1,0 +1,45 @@
+---
+import DefaultLayout from "../layouts/default.astro";
+import { faqs } from "../data/faqs";
+const { frontmatter } = Astro.props;
+---
+
+<DefaultLayout title={frontmatter.title} description={frontmatter.description} pageType="faq" faqs={faqs}>
+  <div class="page-head">
+    <div class="container">
+      <div class="row">
+        <div class="col col-12">
+          <div class="page__info">
+            <h1 class="page__title">{frontmatter.title}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container animate">
+    <article class="page">
+      <div class="page__content">
+        <slot />
+
+        <ul class="faq-questions">
+          {faqs.map((faq) => (
+            <li>
+              <details open>
+                <summary>{faq.question}</summary>
+                <p set:html={faq.answer} />
+                {faq.list?.length ? (
+                  <ul>
+                    {faq.list.map((item) => (
+                      <li set:html={item} />
+                    ))}
+                  </ul>
+                ) : null}
+              </details>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  </div>
+</DefaultLayout>

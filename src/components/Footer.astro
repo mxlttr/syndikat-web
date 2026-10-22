@@ -1,0 +1,93 @@
+---
+import { footer } from "../data/menus";
+import { site } from "../data/consts";
+import { footerGallery } from "../data/footer-gallery";
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="container">
+      <div class="row">
+        <div class="col col-5 col-d-12">
+          <div class="footer__author">
+            <p class="footer__author-name">{site.title}</p>
+            <p class="footer__author-bio">{site.description}</p>
+            <div class="footer-menu">
+              <ul class="footer-menu__list list-reset">
+                {footer.map((item) => (
+                  <li class="footer-menu__item">
+                    <a href={item.link}>{item.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {site.socials && site.socials.length > 0 && (
+              <div class="social">
+                <ul class="social__list list-reset">
+                  {site.socials.map((item) => (
+                    <li class="social__item">
+                      <a
+                        class="social__link"
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener"
+                        aria-label={item.name}
+                        data-social-name={item.name}
+                      >
+                        {item.name === "instagram" && (
+                          <svg
+                            class="lucide"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <rect x="2" y="2" width="20" height="20" rx="5" />
+                            <circle cx="12" cy="12" r="4" />
+                            <path d="M17.5 6.5h.01" />
+                          </svg>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div class="col col-6 push-1 col-d-12 push-d-0">
+          <div class="footer__gallery">
+            <div class="gallery-footer">
+              <div class="gallery" style="grid-template-columns: repeat(3, auto);">
+                {footerGallery &&
+                  footerGallery.map((item) => (
+                    <div class="gallery__image">
+                      <img src={item.image} alt={item.alt} loading="lazy" width="172" height="130" />
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer__info">
+    <div class="container">
+      <div class="row">
+        <div class="col col-12">
+          <div class="footer__info-box">
+            <div class="copyright">
+              {new Date().getFullYear()} &copy; <a href="/">{site.title}</a>. Crafted in{" "}
+              <a href="https://x.com/maex2k">Cologne</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,103 @@
+export const footer = [
+  {
+    label: "Blog",
+    link: "/blog/",
+  },
+  {
+    label: "Kontakt",
+    link: "/contact/",
+  },
+  {
+    label: "Satzung",
+    link: "/satzung/",
+  },
+  {
+    label: "FAQs",
+    link: "/faq/",
+  },
+  {
+    label: "Ratings",
+    link: "/ratings/",
+  },
+  {
+    label: "Datenschutz",
+    link: "/datenschutz/",
+  },
+  {
+    label: "Tracking-Einstellungen",
+    link: "/tracking-ignore.html",
+  },
+  {
+    label: "Impressum",
+    link: "/impressum/",
+  },
+];
+
+export const main = {
+  title: "Hauptmenü",
+  items: [
+    {
+      label: "Über uns",
+      link: "/about/",
+    },
+    {
+      label: "Preisvergleich",
+      link: "/preisvergleich/",
+    },
+    {
+      label: "Turniere",
+      link: "/turniere/",
+    },
+    {
+      label: "Events",
+      link: "/events/",
+    },
+    {
+      label: "Tools",
+      link: "/tools/",
+    },
+    {
+      label: "Mitglied werden",
+      link: "/register/",
+    },
+  ],
+};
+
+export const tools = [
+  {
+    title: "Ratings",
+    description: "Vergleiche Dein Deutschland - Rating mit anderen Spieler*innen in Köln",
+    url: "/ratings/",
+    thumbnail: "ratings_thumb.jpg",
+    alt: "Ratings Treppchen",
+    hide_index: true,
+  },
+  {
+    title: "Disc Dice",
+    description: "Würfle deinen nächsten Wurf und bringe Abwechslung in deine Trainingsrunden",
+    url: "/disc-dice/",
+    thumbnail: "discdice_thumb.jpg",
+    alt: "Disc Dice Würfel App",
+  },
+  {
+    title: "Bag Tag Challenge",
+    description: "Aktuelle Übersicht über unsere Bag Tags",
+    url: "/bagtags/",
+    thumbnail: "bagtags_thumb.jpg",
+    alt: "Bag Tag an Rucksack",
+  },
+  {
+    title: "Turnierkarte",
+    description: "Finde alle Turniere in Deutschland auf einer übersichtlichen Karte",
+    url: "/turniere/",
+    thumbnail: "turnierkarte_thumb.jpg",
+    alt: "Discgolf Turnierkarte Screenshot",
+  },
+  {
+    title: "Preisvergleich",
+    description: "Die besten Deals für Scheiben und Zubehör in 10 Discgolf-Shops",
+    url: "/preisvergleich/",
+    thumbnail: "preisvergleich_thumb.jpg",
+    alt: "Preisvergleich Discgolf Scheiben",
+  },
+];

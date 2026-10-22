@@ -1,0 +1,18 @@
+---
+import DefaultLayout from "../layouts/default.astro";
+import { getCollection } from "astro:content";
+import PostsList from "../components/PostsList.astro";
+import Hero from "../components/Hero.astro";
+import QuickTools from "../components/QuickTools.astro";
+import { getPostDate } from "../utils/posts";
+
+const posts = (await getCollection("blog")).sort(
+  (a: any, b: any) => (getPostDate(b)?.getTime() ?? 0) - (getPostDate(a)?.getTime() ?? 0),
+);
+---
+
+<DefaultLayout title="Disc Golf in Köln">
+  <Hero />
+  <PostsList posts={posts.slice(0, 9)} />
+  <QuickTools />
+</DefaultLayout>

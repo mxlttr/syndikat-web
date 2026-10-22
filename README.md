@@ -1,33 +1,43 @@
-# syndikat-web
-
-The Jekyll-based public website for Syndikat Disc Golf Cologne. It combines Markdown content and Liquid layouts with small browser JavaScript tools and a Svelte product-search bundle.
-
-## Architecture
-
-The ratings page requests `/ratings` for all clubs. Club-specific consumers can request `/ratings/${encodeURIComponent(club)}`, for example `/ratings/disc%20golf%20syndikat`. The filter matches club-name substrings case-insensitively and treats Disc Golf and DG spellings equivalently. Paginated requests accept comma-separated club alternatives, such as `club=Köln,Syndikat`; response fields and original rankings are unchanged.
-
-Jekyll renders pages, posts, layouts, includes, and `_data` into the static site. JavaScript powers interactive pages such as ratings, bag tags, training signups, and the tournament map. Svelte is reserved for the product search. See [architecture](docs/architecture.md) and [development](docs/development.md).
-
-## Prerequisites
-
-- Node.js 22.18 or newer and npm
-- Ruby and Bundler (versions locked by `Gemfile.lock`)
-
-## Setup and commands
+# Astro Starter Kit: Minimal
 
 ```sh
-npm install
-bundle install
-npm run dev
+npm create astro@latest -- --template minimal
 ```
 
-`npm run dev` starts Jekyll and the Svelte development build. For a production-equivalent build:
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-```sh
-npm run build:assets
-npm run build
+## 🚀 Project Structure
+
+Inside of your Astro project, you'll see the following folders and files:
+
+```text
+/
+├── public/
+├── src/
+│   └── pages/
+│       └── index.astro
+└── package.json
 ```
 
-The full build runs Svelte and CSS asset builds, Jekyll production rendering, and critical-CSS generation. Netlify runs `npm run build` and publishes `_site`.
+Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-When changing a website API call, coordinate the implementation and [API contract](https://github.com/mxlttr/syndikat-api/blob/master/docs/openapi.yaml) in `mxlttr/syndikat-api`.
+There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+
+Any static assets, like images, can be placed in the `public/` directory.
+
+## 🧞 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

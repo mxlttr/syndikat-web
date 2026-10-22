@@ -1,0 +1,44 @@
+---
+import { Image } from "astro:assets";
+const { posts } = Astro.props;
+import { getPostDate, getPostExcerpt, getPostUrl } from "../utils/posts";
+---
+
+<div class="container">
+  <div class="row animate">
+    {posts.map((post: any) => (
+      <div class="article col col-4 col-d-6 col-t-12">
+        <div class="article__inner">
+          <div class="article__head">
+            <time class="article__date" datetime={getPostDate(post)?.toISOString() ?? null}>
+              {getPostDate(post)?.toLocaleDateString("de-DE", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+            {post.video && (
+              <div class="video-icon">
+                <div class="circle pulse" />
+                <div class="circle">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <polygon points="40,30 65,50 40,70" />
+                  </svg>
+                </div>
+              </div>
+            )}
+            <a class="article__image" href={getPostUrl(post)}>
+              <Image width="350" height="233" src={post.data.image} alt={post.data.title || ""} />
+            </a>
+          </div>
+          <div class="article__content">
+            <h2 class="article__title">
+              <a href={getPostUrl(post)}>{post.data.title}</a>
+            </h2>
+            {post.body && <p class="article__excerpt">{getPostExcerpt(post)}</p>}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
