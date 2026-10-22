@@ -1,0 +1,107 @@
+# UI strings for German pages. Keep keys in sync with en.yml.
+# Use in templates with {{ 'key.path' | t }}; placeholders like %{page} are filled via t: page: 1.
+locale: de_DE
+date_format: "%-d. %B %Y"
+months:
+  - Januar
+  - Februar
+  - März
+  - April
+  - Mai
+  - Juni
+  - Juli
+  - August
+  - September
+  - Oktober
+  - November
+  - Dezember
+
+language:
+  name: Deutsch
+  switch_label: Auf Deutsch lesen
+
+hero:
+  title: Hey, wir sind das Syndikat
+  discord: Discord beitreten
+  membership: Mitglied werden
+  image_alt: Discgolfscheiben in einem Rucksack
+
+pagination:
+  previous: Vorherige
+  next: Nächste
+  count: Seite %{page} von %{total}
+
+search:
+  label: Durchsuche die Website
+  placeholder: Suchen …
+
+tags:
+  view_all: Alle ansehen
+  back_to_top: Nach oben
+
+post:
+  co_author: Co-Autor
+  ai_translation_notice: ""
+  ai_translation_link: ""
+
+author:
+  default_bio: Autor bei syndikat.golf und Mitglied des Disc Golf Syndikat Koeln.
+  posts_by: Artikel von %{name}
+  page_title: "%{name} beim Disc Golf Syndikat"
+
+contact:
+  name_label: Dein Name
+  name_placeholder: Name
+  email_label: Deine Email
+  email_placeholder: Email
+  message_label: Deine Nachricht
+  message_placeholder: Nachricht
+  submit: Abschicken
+
+membership:
+  yearly: Jährlich
+  monthly: Monatlich
+  select: Auswählen
+  register: Anmelden
+  stripe_locale: de
+
+checklist:
+  summary: Turnier-Packliste zum Abhaken ausklappen
+  reset: Liste zurücksetzen
+
+product_search:
+  supported_shops: Unterstützte Shops
+  missing_shop: Ein Shop fehlt noch in der Liste oder du hast Feedback zum Tool?
+  contact_link: Schreib uns über das Kontaktformular
+  noscript: Für die Live-Suche im Preisvergleich muss JavaScript aktiviert sein. Die Informationen auf dieser Seite helfen dir trotzdem dabei, das Tool und die unterstützten Shops einzuordnen.
+
+ratings:
+  noscript: Bitte aktiviere JavaScript, um die Ratings anzuzeigen.
+
+bag_tags:
+  rank: Rang
+  name: Name
+
+dice_game:
+  intro: Drück den Button und lass den Zufall entscheiden wie der nächste Wurf aussieht! Der erste Würfel gibt den Wurf an, der Zweite die Art der Scheibe. Viel Spaß beim Spielen!
+  roll: Roll the dice
+
+tournaments:
+  route_eyebrow: Anfahrt zum Turnier
+  route_title: Route mit dem Auto berechnen
+  route_copy: Wähle zuerst ein Turnier auf der Karte aus und gib dann eine vollständige Startadresse ein. Für das MVP funktionieren Straße, Hausnummer, Postleitzahl und Ort am verlässlichsten.
+  route_origin_label: Startadresse
+  route_origin_placeholder: Straße, Hausnummer, Postleitzahl, Ort
+  route_submit: Route berechnen
+  route_initial_message: Wähle ein Turnier auf der Karte, um die Route zu planen.
+  route_train: Mit der Bahn suchen
+  overview_eyebrow: Offizielle Turniere
+  overview_title: Alle anstehenden Turniere
+  overview_copy: Die Liste zeigt die anstehenden Turniere von turniere.discgolf.de, mit Datum, Ort, Status und aktueller Auslastung.
+  loading: Lade Turniere …
+  col_status: Status
+  col_tournament: Turnier
+  col_date: Datum
+  col_location: Ort
+  col_spots: Plätze
+  col_action: Aktion

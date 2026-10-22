@@ -100,6 +100,114 @@ from = "/turniere"
 to = "/turniere/"
 status = 301
 
+
+# English version (/en/...): same trailing-slash redirects as above.
+[[redirects]]
+from = "/en"
+to = "/en/"
+status = 301
+
+[[redirects]]
+from = "/en/membership"
+to = "/en/register/"
+status = 301
+
+[[redirects]]
+from = "/en/about"
+to = "/en/about/"
+status = 301
+
+[[redirects]]
+from = "/en/bagtags"
+to = "/en/bagtags/"
+status = 301
+
+[[redirects]]
+from = "/en/blog"
+to = "/en/blog/"
+status = 301
+
+[[redirects]]
+from = "/en/contact"
+to = "/en/contact/"
+status = 301
+
+[[redirects]]
+from = "/en/datenschutz"
+to = "/en/datenschutz/"
+status = 301
+
+[[redirects]]
+from = "/en/disc-dice"
+to = "/en/disc-dice/"
+status = 301
+
+[[redirects]]
+from = "/en/events"
+to = "/en/events/"
+status = 301
+
+[[redirects]]
+from = "/en/faq"
+to = "/en/faq/"
+status = 301
+
+[[redirects]]
+from = "/en/impressum"
+to = "/en/impressum/"
+status = 301
+
+[[redirects]]
+from = "/en/preisvergleich"
+to = "/en/preisvergleich/"
+status = 301
+
+[[redirects]]
+from = "/en/ratings"
+to = "/en/ratings/"
+status = 301
+
+[[redirects]]
+from = "/en/register"
+to = "/en/register/"
+status = 301
+
+[[redirects]]
+from = "/en/satzung"
+to = "/en/satzung/"
+status = 301
+
+[[redirects]]
+from = "/en/success"
+to = "/en/success/"
+status = 301
+
+[[redirects]]
+from = "/en/tags"
+to = "/en/tags/"
+status = 301
+
+[[redirects]]
+from = "/en/tools"
+to = "/en/tools/"
+status = 301
+
+[[redirects]]
+from = "/en/training"
+to = "/en/training/"
+status = 301
+
+[[redirects]]
+from = "/en/turniere"
+to = "/en/turniere/"
+status = 301
+
+# Unknown /en/ URLs get the English 404 page (only applies when no file matches).
+[[redirects]]
+from = "/en/*"
+to = "/en/404.html"
+status = 404
+
 [[redirects]]
 from = "https://community.syndikat.golf/*"
 to = "https://discord.gg/bus8ZcaNFT"

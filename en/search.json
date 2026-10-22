@@ -1,0 +1,4 @@
+---
+layout: none
+---
+{% include search_index.json lang=page.lang %}

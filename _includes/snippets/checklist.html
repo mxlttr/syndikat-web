@@ -1,14 +1,15 @@
 <details>
-    <summary>Turnier-Packliste zum Abhaken ausklappen</summary>
+    <summary>{{ 'checklist.summary' | t }}</summary>
 
-    {% for check in site.data.checklist %}
+    {% assign checklist = 'checklist' | localized_data %}
+    {% for check in checklist %}
         <div class="form__checkbox-group"><label class="form__label form__checkbox-group">
             <input type="checkbox" data-value="{{ check | slugify }}" class="form__input">{{ check }}</label>
         </div>
     {% endfor %}
 
     <button class="button" data-clear>
-        Liste zurücksetzen
+        {{ 'checklist.reset' | t }}
     </button>
 </details>
 

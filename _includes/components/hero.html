@@ -7,16 +7,15 @@
       <div class="col col-12">
         <div class="hero__inner">
           <div class="hero__left">
-            <h1 class="hero__title">Hey, wir sind das Syndikat</h1>
-            <p class="hero__description">{{- site.description | escape -}}</p>
+            <h1 class="hero__title">{{ 'hero.title' | t }}</h1>
+            <p class="hero__description">{{- 'site_description' | t: fallback: site.description | escape -}}</p>
             <div class="hero__subscribe">
               <button class="button button--primary button--icon" id="btn-discord" data-umami-event="discord_click"
                 type="submit" onclick="window.open('\/\/community.syndikat.golf');">
                 {% include snippets/logo-discord.html %}
-                Discord beitreten
+                {{ 'hero.discord' | t }}
               </button>
-              <a href="/register/" class="button" id="btn-membership" data-umami-event="member_click">Mitglied
-                werden</a>
+              <a href="{{ '/register/' | localize_url }}" class="button" id="btn-membership" data-umami-event="member_click">{{ 'hero.membership' | t }}</a>
             </div>
           </div>
           <div class="hero__right">
@@ -25,7 +24,7 @@
                 <source media="(min-width: 577px)" srcset="{{ hero_srcset | strip }}"
                   sizes="(max-width: 768px) 560px, (max-width: 1024px) 740px, 600px">
                 <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" width="534" height="400"
-                  alt="Discgolfscheiben in einem Rucksack">
+                  alt="{{ 'hero.image_alt' | t }}">
               </picture>
             </div>
           </div>

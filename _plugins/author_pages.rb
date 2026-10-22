@@ -2,12 +2,14 @@
 
 module Jekyll
   class AuthorPage < PageWithoutAFile
-    def initialize(site, base, author_id, author_data, permalink)
+    def initialize(site, base, author_id, author_data, permalink, lang)
       dir = permalink.sub(%r!\A/!, "").sub(%r!/+\z!, "")
       super(site, base, dir, "index.html")
 
+      title_template = site.data.dig("i18n", lang, "author", "page_title") || "%{name}"
       data["layout"] = "author"
-      data["title"] = "#{author_data["name"]} beim Disc Golf Syndikat"
+      data["lang"] = lang
+      data["title"] = title_template.gsub("%{name}", author_data["name"])
       data["author_id"] = author_id
       data["permalink"] = permalink
     end
@@ -30,7 +32,10 @@ module Jekyll
         raise Errors::FatalException, "Author '#{author_id}' is missing a name in _data/authors.yml" if name.empty?
 
         permalink = normalize_permalink(author_id, author_data["url"])
-        site.pages << AuthorPage.new(site, site.source, author_id, author_data, permalink)
+        I18n.languages(site).each do |lang|
+          localized = I18n.localize_url(site, permalink, lang)
+          site.pages << AuthorPage.new(site, site.source, author_id, author_data, localized, lang)
+        end
       end
     end
 

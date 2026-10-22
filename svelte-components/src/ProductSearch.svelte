@@ -8,6 +8,7 @@
   import ProductCard from "./ProductCard.svelte";
   import Wishlist from "./Wishlist.svelte";
   import { shops } from "./shopData.js";
+  import { l } from "./i18n.js";
 
   const activeShops = shops.filter((shop) => !shop.disabled);
   const shopHandles = activeShops.map((shop) => shop.handle);
@@ -262,7 +263,7 @@
     </div>
   {/if}
   <label for="js-product-input" class="screen-reader-text"
-    >Suche nach Produkten</label
+    >{l({ de: "Suche nach Produkten", en: "Search for products" })}</label
   >
   <input
     type="text"
@@ -270,7 +271,7 @@
     id="js-product-input"
     bind:this={searchInputElement}
     bind:value={query}
-    placeholder="Suche eine Scheibe …"
+    placeholder={l({ de: "Suche eine Scheibe …", en: "Search for a disc …" })}
   />
   <button type="submit" class="button button--primary">
     <Icon name="search" />
@@ -306,10 +307,10 @@
 
   {#if $products.length}
     <select bind:value={$sort} on:change={handleSort}>
-      <option value="default">Standard</option>
-      <option value="availability">Verfügbarkeit</option>
-      <option value="price-ascending">Preis aufsteigend</option>
-      <option value="price-descending">Preis absteigend</option>
+      <option value="default">{l({ de: "Standard", en: "Default" })}</option>
+      <option value="availability">{l({ de: "Verfügbarkeit", en: "Availability" })}</option>
+      <option value="price-ascending">{l({ de: "Preis aufsteigend", en: "Price ascending" })}</option>
+      <option value="price-descending">{l({ de: "Preis absteigend", en: "Price descending" })}</option>
     </select>
   {/if}
 </div>
@@ -320,12 +321,12 @@
   {:else}
     {#if defaultState || !query}
       <div class="col col-12">
-        <p>Nutze die Suche oben, um Preise und Verfügbarkeiten zu vergleichen.</p>
+        <p>{l({ de: "Nutze die Suche oben, um Preise und Verfügbarkeiten zu vergleichen.", en: "Use the search above to compare prices and availability." })}</p>
       </div>
 
       {#if $newProducts.length}
         <div class="col col-12">
-          <h3>Neuheiten und Restocks</h3>
+          <h3>{l({ de: "Neuheiten und Restocks", en: "New arrivals and restocks" })}</h3>
           <div class="row">
             {#each $newProducts as product}
               <ProductCard {product} {wishlist} />
@@ -335,7 +336,7 @@
       {/if}
     {:else}
       <div class="col">
-        <p>Keine Produkte für {searchedQuery} gefunden.</p>
+        <p>{l({ de: `Keine Produkte für ${searchedQuery} gefunden.`, en: `No products found for ${searchedQuery}.` })}</p>
       </div>
     {/if}
   {/each}

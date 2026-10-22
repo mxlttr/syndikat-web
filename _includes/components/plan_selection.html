@@ -1,9 +1,9 @@
-{% assign plans = site.data.plans %}
+{% assign plans = 'plans' | localized_data %}
 
 <div class="period-select">
   <div class="period-select__button-group">
-    <button class="button button--primary" data-period="yearly">Jährlich</button>
-    <button class="button" data-period="monthly">Monatlich</button>
+    <button class="button button--primary" data-period="yearly">{{ 'membership.yearly' | t }}</button>
+    <button class="button" data-period="monthly">{{ 'membership.monthly' | t }}</button>
   </div>
 </div>
 
@@ -31,9 +31,9 @@
               </p>
               <div class="plan-card__cta">
                 {% if period.link %}
-                  <a href="{{ period.link }}?locale=de" target="_blank" class="button{% if period.featured %} button--primary{% endif %}">Auswählen</a>
+                  <a href="{{ period.link }}?locale={{ 'membership.stripe_locale' | t }}" target="_blank" class="button{% if period.featured %} button--primary{% endif %}">{{ 'membership.select' | t }}</a>
                 {% else %}
-                  <span class="button{% if period.featured %} button--primary{% endif %}" disabled>Auswählen</span>
+                  <span class="button{% if period.featured %} button--primary{% endif %}" disabled>{{ 'membership.select' | t }}</span>
                 {% endif %}
               </div>
             </div>

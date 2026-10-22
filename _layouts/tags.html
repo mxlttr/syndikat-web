@@ -8,8 +8,10 @@ layout: default
       <div class="row">
         <div class="col col-12">
           <h1 class="tag__title">Tags</h1>
+          {%- assign tag_groups = site.tags -%}
+          {%- if page.lang != site.languages[0] -%}{%- assign tag_groups = '' | localized_posts | group_tags -%}{%- endif -%}
           <ul class="tag__list list-reset">
-            {%- for tag in site.tags -%}
+            {%- for tag in tag_groups -%}
               <li class="tag__item">
                 <a href="#{{- tag[0] | downcase -}}" class="tag__link">{{- tag[0] -}}</a>
               </li>
@@ -20,7 +22,7 @@ layout: default
     </div>
   </div>
 
-  {% for tag in site.tags %}
+  {% for tag in tag_groups %}
     <div class="tags__inner">
       <div class="container">
         <div class="row">
@@ -34,7 +36,7 @@ layout: default
                 </div>
                 <h2 class="tag__name" id="{{- tag[0] | downcase -}}">{{- tag[0] -}}</h2>
               </div>
-              <a class="top__link" href="#top">Nach oben</a>
+              <a class="top__link" href="#top">{{ 'tags.back_to_top' | t }}</a>
             </div>
           </div>
         </div>

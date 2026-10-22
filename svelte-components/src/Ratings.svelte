@@ -3,6 +3,7 @@
   import { TrendingUp, TrendingDown, X } from "lucide-svelte";
   import { fetchPlayer, fetchRatings } from "./api";
   import HistoricRatingsChart from "./HistoricRatingsChart.svelte";
+  import { l, locale } from "./i18n.js";
 
   let players = [];
   let loading = true;
@@ -21,7 +22,7 @@
   let totalPlayers = 0;
   let divisions = [];
   let searchTimer;
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -233,8 +234,8 @@
       <button
         type="button"
         class="search__close"
-        aria-label="Suche löschen"
-        title="Suche löschen"
+        aria-label={l({ de: "Suche löschen", en: "Clear search" })}
+        title={l({ de: "Suche löschen", en: "Clear search" })}
         on:click={clearPlayerSearch}
       >
         <X size={18} aria-hidden="true" />
@@ -246,8 +247,8 @@
       data-rating-search
       class="search__text"
       bind:this={searchInputElement}
-      aria-label="Spieler oder Verein suchen"
-      placeholder="Spieler/Verein suchen..."
+      aria-label={l({ de: "Spieler oder Verein suchen", en: "Search player or club" })}
+      placeholder={l({ de: "Spieler/Verein suchen...", en: "Search player/club..." })}
       bind:value={search}
       on:input={searchPlayers}
       disabled={error || (loading && players.length === 0)}
@@ -265,12 +266,12 @@
       }}
       disabled={loading || error}
     >
-      <option value="all">Alle Divisionen</option>
+      <option value="all">{l({ de: "Alle Divisionen", en: "All divisions" })}</option>
       {#each divisions as item}<option value={item}>{item}</option>{/each}
     </select>
     <select
       data-toggle-club
-      aria-label="Vereine"
+      aria-label={l({ de: "Vereine", en: "Clubs" })}
       bind:value={club}
       on:change={() => {
         search = "";
@@ -279,9 +280,9 @@
       }}
       disabled={loading || error}
     >
-      <option value="syndikat-only">Nur Syndikat</option>
-      <option value="cologne-only">Nur Kölner Clubs</option>
-      <option value="all">Alle zeigen</option>
+      <option value="syndikat-only">{l({ de: "Nur Syndikat", en: "Syndikat only" })}</option>
+      <option value="cologne-only">{l({ de: "Nur Kölner Clubs", en: "Cologne clubs only" })}</option>
+      <option value="all">{l({ de: "Alle zeigen", en: "Show all" })}</option>
     </select>
   </div>
 </div>
@@ -289,16 +290,16 @@
 <div class="table-responsive" aria-busy={loading}>
   <table
     id="ratings"
-    aria-label="Deutschland-Rating der Spielerinnen und Spieler"
+    aria-label={l({ de: "Deutschland-Rating der Spielerinnen und Spieler", en: "German ratings of players" })}
   >
     <thead>
       <tr>
-        <th scope="col">Rang</th>
+        <th scope="col">{l({ de: "Rang", en: "Rank" })}</th>
         <th scope="col">Name</th>
         <th scope="col">Rating</th>
         <th scope="col">Division</th>
-        <th scope="col">Rang in Division</th>
-        <th scope="col">Runden</th>
+        <th scope="col">{l({ de: "Rang in Division", en: "Division rank" })}</th>
+        <th scope="col">{l({ de: "Runden", en: "Rounds" })}</th>
         <th scope="col">letzte Runde</th>
       </tr>
     </thead>
@@ -332,13 +333,12 @@
       {:else if error && players.length === 0}
         <tr
           ><td class="ratings-error" colspan="7" role="alert"
-            >Ratings konnten gerade nicht geladen werden. Bitte versuche es
-            später erneut.</td
+            >{l({ de: "Ratings konnten gerade nicht geladen werden. Bitte versuche es später erneut.", en: "Ratings could not be loaded right now. Please try again later." })}</td
           ></tr
         >
       {:else}
         {#if error}
-          <tr><td class="ratings-error" colspan="7" role="alert">Die Aktualisierung konnte nicht geladen werden. Die zuletzt geladenen Ratings werden angezeigt.</td></tr>
+          <tr><td class="ratings-error" colspan="7" role="alert">{l({ de: "Die Aktualisierung konnte nicht geladen werden. Die zuletzt geladenen Ratings werden angezeigt.", en: "The update could not be loaded. Showing the most recently loaded ratings." })}</td></tr>
         {/if}
         {#each players as player, index (player.gtNumber || player.link)}
           <tr
@@ -346,7 +346,7 @@
             data-club={player.club}
             role="button"
             tabindex="0"
-            aria-label={`Spielerprofil von ${player.firstName} ${player.lastName} öffnen`}
+            aria-label={l({ de: `Spielerprofil von ${player.firstName} ${player.lastName} öffnen`, en: `Open player profile of ${player.firstName} ${player.lastName}` })}
             on:click={() => openPlayer(player)}
             on:keydown={(event) => handlePlayerRowKeydown(event, player)}
           >
@@ -382,13 +382,13 @@
                 <TrendingUp
                   class="lucide color--green"
                   size={24}
-                  aria-label="Rating gestiegen"
+                  aria-label={l({ de: "Rating gestiegen", en: "Rating increased" })}
                 />
               {:else if player.ratingChange < 0}
                 <TrendingDown
                   class="lucide color--red"
                   size={24}
-                  aria-label="Rating gesunken"
+                  aria-label={l({ de: "Rating gesunken", en: "Rating decreased" })}
                 />
               {/if}
             </td>
@@ -413,7 +413,7 @@
         {:else}
           <tr
             ><td class="ratings-error" colspan="7" role="status"
-              >Keine Spieler*innen gefunden.</td
+              >{l({ de: "Keine Spieler*innen gefunden.", en: "No players found." })}</td
             ></tr
           >
         {/each}
@@ -423,20 +423,20 @@
 </div>
 
 {#if !loading && !error && totalPages > 1}
-  <nav class="ratings-pagination" aria-label="Ratingseiten">
-    <button type="button" class="button button--text" on:click={() => loadRatings(currentPage - 1)} disabled={loading || currentPage === 1}>← Zurück</button>
-    <span>Seite {currentPage} von {totalPages} · {totalPlayers} Spieler*innen</span>
-    <button type="button" class="button button--text" on:click={() => loadRatings(currentPage + 1)} disabled={loading || currentPage === totalPages}>Weiter →</button>
+  <nav class="ratings-pagination" aria-label={l({ de: "Ratingseiten", en: "Rating pages" })}>
+    <button type="button" class="button button--text" on:click={() => loadRatings(currentPage - 1)} disabled={loading || currentPage === 1}>← {l({ de: "Zurück", en: "Back" })}</button>
+    <span>{l({ de: `Seite ${currentPage} von ${totalPages} · ${totalPlayers} Spieler*innen`, en: `Page ${currentPage} of ${totalPages} · ${totalPlayers} players` })}</span>
+    <button type="button" class="button button--text" on:click={() => loadRatings(currentPage + 1)} disabled={loading || currentPage === totalPages}>{l({ de: "Weiter", en: "Next" })} →</button>
   </nav>
 {/if}
 
 {#if selectedPlayer}
   <dialog class="rating-modal" aria-labelledby="player-modal-title" use:showModal on:click={handleDialogClick} on:keydown={handleDialogKeydown} on:close={closePlayer}>
-      <button class="rating-modal__close" aria-label="Dialog schließen" on:click={closePlayer}>×</button>
+      <button class="rating-modal__close" aria-label={l({ de: "Dialog schließen", en: "Close dialog" })} on:click={closePlayer}>×</button>
       <header class="rating-modal__hero">
         <div class="rating-modal__avatar" style={`background-color: ${avatarColorForName(selectedPlayer.name)}`}>{initials(selectedPlayer.name)}</div>
         <div>
-          <p class="rating-modal__eyebrow">Spielerprofil</p>
+          <p class="rating-modal__eyebrow">{l({ de: "Spielerprofil", en: "Player profile" })}</p>
           <h2 id="player-modal-title">{selectedPlayer.name}</h2>
           {#if selectedPlayer.club}
             <p class="rating-modal__club">{selectedPlayer.club}</p>
@@ -445,18 +445,18 @@
       </header>
       <div class="rating-modal__content" class:rating-modal__content--state={playerLoading || playerError}>
         {#if playerLoading}
-          <p>Spielerdaten werden geladen …</p>
+          <p>{l({ de: "Spielerdaten werden geladen …", en: "Loading player data …" })}</p>
         {:else if playerError}
-          <p class="ratings-error">Spielerdaten konnten gerade nicht geladen werden.</p>
+          <p class="ratings-error">{l({ de: "Spielerdaten konnten gerade nicht geladen werden.", en: "Player data could not be loaded right now." })}</p>
         {:else}
         <div class="rating-modal__stats">
-          <div><strong>{selectedPlayer.tournaments?.length || 0}</strong><span>Turniere</span></div>
-          <div><strong>{selectedPlayer.tournaments?.reduce((sum, item) => sum + (item.rounds?.length || 0), 0) || 0}</strong><span>Runden</span></div>
-          <div><strong>{formatRating(selectedPlayer.rating)}</strong><span>Aktuelles Rating</span></div>
-          <div><strong>{selectedPlayer.divisionRank}</strong><span>Rang in Division</span></div>
+          <div><strong>{selectedPlayer.tournaments?.length || 0}</strong><span>{l({ de: "Turniere", en: "Tournaments" })}</span></div>
+          <div><strong>{selectedPlayer.tournaments?.reduce((sum, item) => sum + (item.rounds?.length || 0), 0) || 0}</strong><span>{l({ de: "Runden", en: "Rounds" })}</span></div>
+          <div><strong>{formatRating(selectedPlayer.rating)}</strong><span>{l({ de: "Aktuelles Rating", en: "Current rating" })}</span></div>
+          <div><strong>{selectedPlayer.divisionRank}</strong><span>{l({ de: "Rang in Division", en: "Division rank" })}</span></div>
           <div><strong>{selectedPlayer.gtNumber}</strong><span>GT-Nummer</span></div>
         </div>
-        <h3>Turnierverlauf</h3>
+        <h3>{l({ de: "Turnierverlauf", en: "Tournament history" })}</h3>
         <HistoricRatingsChart ratings={selectedPlayer.historicRatings} playerName={selectedPlayer.name} />
         {#if selectedPlayer.tournaments?.length}
           {#each selectedPlayer.tournaments as tournament}
@@ -475,15 +475,15 @@
                 {/if}
               </div>
               {#if tournament.rounds?.length}
-                <table class="rating-modal__rounds"><thead><tr><th>Runde</th><th>Rating</th><th>Division</th><th>Bahnen</th><th>Status</th></tr></thead><tbody>
+                <table class="rating-modal__rounds"><thead><tr><th>{l({ de: "Runde", en: "Round" })}</th><th>Rating</th><th>Division</th><th>{l({ de: "Bahnen", en: "Holes" })}</th><th>Status</th></tr></thead><tbody>
                   {#each tournament.rounds as round}
                     <tr><td><b>R{round.roundNumber}</b></td><td>{formatRating(round.rating)} {#if selectedPlayer.rating && round.rating > selectedPlayer.rating + 10}<TrendingUp class="round-trend color--green" size={16} aria-label="Mehr als 10 Punkte über aktuellem Rating" />{:else if selectedPlayer.rating && round.rating < selectedPlayer.rating - 10}<TrendingDown class="round-trend color--red" size={16} aria-label="Mehr als 10 Punkte unter aktuellem Rating" />{/if}</td><td>{round.division || "–"}</td><td>{round.holes || "–"}</td><td>{round.inRating ? "im Rating" : "–"}</td></tr>
                   {/each}
                 </tbody></table>
-              {:else}<span class="rating-modal__muted">Keine Runden erfasst.</span>{/if}
+              {:else}<span class="rating-modal__muted">{l({ de: "Keine Runden erfasst.", en: "No rounds recorded." })}</span>{/if}
             </article>
           {/each}
-        {:else}<p>Keine Turnierdaten vorhanden.</p>{/if}
+        {:else}<p>{l({ de: "Keine Turnierdaten vorhanden.", en: "No tournament data available." })}</p>{/if}
         {/if}
       </div>
   </dialog>

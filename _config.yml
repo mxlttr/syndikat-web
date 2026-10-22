@@ -40,6 +40,39 @@ plugins:
   - jekyll-paginate
   - jekyll-sitemap
 
+# Languages: the first one is the default and lives at the site root, the others under /<lang>/.
+# See _plugins/i18n.rb and docs/development.md.
+languages:
+  - de
+  - en
+
+collections:
+  en_posts:
+    output: true
+    permalink: /en/blog/:title/
+
+feed:
+  collections:
+    en_posts:
+      path: /en/feed.xml
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      lang: de
+  - scope:
+      path: "en"
+    values:
+      lang: en
+  - scope:
+      path: ""
+      type: en_posts
+    values:
+      lang: en
+      layout: post
+      ai_translated: true
+
 socials:
   #- name: twitter
   #  url: https://twitter.com

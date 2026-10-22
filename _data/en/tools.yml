@@ -1,0 +1,27 @@
+# Links are localized automatically (/ratings/ -> /en/ratings/).
+- title: Ratings
+  description: Compare your German rating with other players in Cologne
+  url: /ratings/
+  thumbnail: ratings_thumb.jpg
+  alt: Ratings podium
+  hide_index: true
+- title: Disc Dice
+  description: Roll your next throw and add variety to your practice rounds
+  url: /disc-dice/
+  thumbnail: discdice_thumb.jpg
+  alt: Disc Dice app
+- title: Bag Tag Challenge
+  description: Current overview of our bag tags
+  url: /bagtags/
+  thumbnail: bagtags_thumb.jpg
+  alt: Bag tag on a backpack
+- title: Tournament map
+  description: Find all tournaments in Germany on a clear map
+  url: /turniere/
+  thumbnail: turnierkarte_thumb.jpg
+  alt: Disc golf tournament map screenshot
+- title: Price comparison
+  description: The best deals on discs and accessories across 10 disc golf shops
+  url: /preisvergleich/
+  thumbnail: preisvergleich_thumb.jpg
+  alt: Disc golf price comparison

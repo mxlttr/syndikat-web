@@ -25,6 +25,18 @@ Create regular pages as root-level Markdown files with front matter and posts as
 
 Images and other static files belong under `assets/`. Check responsive image and image-CDN behavior before adding very large assets. Editing `_config.yml` requires restarting Jekyll because it is not reloaded by `jekyll serve`.
 
+### Translations (German and English)
+
+German is the default language and lives at the site root; English lives under `/en/`. The logic is in `_plugins/i18n.rb`, and the languages are listed under `languages:` in `_config.yml`.
+
+- **Pages:** add the English version under `en/` using the same file name, e.g. `en/training.md` for `training.md`. Pages are paired by URL (`/training/` ↔ `/en/training/`). If a page sets a `permalink`, prefix it with `/en`. To pair pages whose URLs don't match, give both the same `ref:` front-matter key.
+- **Posts:** English posts go in `_en_posts/` with the same file name as the German post in `_posts/`, so they get the URL `/en/blog/<slug>/`. They automatically show a note that the post was translated with AI. Set `ai_translated: false` once someone has reviewed the translation.
+- **UI strings:** templates use `{{ 'key.path' | t }}` with the dictionaries `_data/i18n/de.yml` and `_data/i18n/en.yml`. Add every new key to both files. A missing key logs an `i18n:` warning during the build.
+- **Data files:** `{% assign faqs = 'faqs' | localized_data %}` reads `_data/en/faqs.yml` on English pages and `_data/faqs.yml` otherwise. Copies under `_data/en/` exist for menus, FAQs, plans, registration fields, tools, the checklist and the footer gallery. When you change prices, Stripe links or field ids, update both copies.
+- **Links:** `{{ '/register/' | localize_url }}` gives `/en/register/` on English pages. Menu and tool links in data files are localized automatically.
+- **JavaScript:** `assets/js/common.js` defines `PAGE_LANG`, `PAGE_LOCALE` and `localize({ de, en })`, and Svelte components import the same helpers from `svelte-components/src/i18n.js`.
+- **Pagination:** the German blog uses `jekyll-paginate`, the English blog uses `paginate_collection: en_posts` (in `en/blog/index.html`).
+
 ### Campaign links
 
 Tag links shared in Discord with Umami UTM parameters so visits can be attributed even when Discord does not pass a referrer. Keep `utm_source=discord` and `utm_medium=community` consistent, and use lowercase values. Give each campaign a descriptive `utm_campaign`; use `utm_content` when distinguishing posts or placements. For example:
