@@ -1,0 +1,79 @@
+---
+import { getCollection } from "astro:content";
+import DefaultLayout from "../layouts/default.astro";
+import PostsList from "../components/PostsList.astro";
+import { getPostDate } from "../utils/posts";
+
+const allPosts = await getCollection("blog");
+const postsByTag = new Map<string, typeof allPosts>();
+
+for (const post of allPosts) {
+  const tags = post.data.tags?.split(/\s+/).filter(Boolean) ?? [];
+
+  for (const tag of tags) {
+    const posts = postsByTag.get(tag) ?? [];
+    posts.push(post);
+    postsByTag.set(tag, posts);
+  }
+}
+
+const tags = [...postsByTag.entries()]
+  .map(([name, posts]) => ({
+    name,
+    posts: posts.sort((a, b) => (getPostDate(b)?.getTime() ?? 0) - (getPostDate(a)?.getTime() ?? 0)),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: "base" }));
+
+const title = "Themen im Disc Golf Blog";
+const description = "Alle Themen und Schlagwörter aus dem Blog des Disc Golf Syndikat im Überblick.";
+---
+
+<DefaultLayout title={title} description={description} pageType="collection">
+  <section class="tags">
+    <div class="tag__head">
+      <div class="container">
+        <div class="row">
+          <div class="col col-12">
+            <h1 class="tag__title">Tags</h1>
+            <ul class="tag__list list-reset">
+              {tags.map(({ name }) => (
+                <li class="tag__item">
+                  <a href={`#${name.toLowerCase()}`} class="tag__link">
+                    {name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {tags.map(({ name, posts }) => (
+      <div class="tags__inner">
+        <div class="container">
+          <div class="row">
+            <div class="col col-12">
+              <div class="tag__info">
+                <div class="tag__info-box">
+                  <div class="tag__counter">
+                    <span>{posts.length}</span>
+                    <small>Post{posts.length === 1 ? "" : "s"}</small>
+                  </div>
+                  <h2 class="tag__name" id={name.toLowerCase()}>
+                    {name}
+                  </h2>
+                </div>
+                <a class="top__link" href="#top">
+                  Nach oben
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <PostsList posts={posts} />
+      </div>
+    ))}
+  </section>
+</DefaultLayout>

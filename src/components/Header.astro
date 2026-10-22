@@ -1,0 +1,265 @@
+---
+import { site } from "../data/consts";
+import { main } from "../data/menus";
+import { X, Moon, Sun, Search, Menu } from "@lucide/astro";
+---
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    let savedTheme = null;
+    try {
+      const saved = window.localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") savedTheme = saved;
+    } catch {
+      // Use the system theme when storage is unavailable.
+    }
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    const theme = savedTheme ?? (prefersDark ? "dark" : "light");
+    root.toggleAttribute("dark", theme === "dark");
+    root.style.colorScheme = theme;
+  })();
+</script>
+
+<script>
+  const menuOpenIcon = document.querySelector(".icon__menu"),
+    menuCloseIcon = document.querySelector(".nav__icon-close"),
+    menuList = document.querySelector(".main-nav"),
+    menuPanel = document.querySelector(".main-nav__box"),
+    themeButton = document.querySelector<HTMLButtonElement>(".toggle-theme");
+
+  menuOpenIcon?.addEventListener("click", () => {
+    menuOpen();
+  });
+
+  menuCloseIcon?.addEventListener("click", () => {
+    menuClose();
+  });
+
+  function menuOpen() {
+    menuList?.classList.add("is-open");
+    menuList?.setAttribute("aria-hidden", "false");
+    menuPanel?.setAttribute("data-open", "true");
+    menuOpenIcon?.setAttribute("aria-expanded", "true");
+  }
+
+  function menuClose() {
+    menuList?.classList.remove("is-open");
+    menuList?.setAttribute("aria-hidden", "true");
+    menuPanel?.setAttribute("data-open", "false");
+    menuOpenIcon?.setAttribute("aria-expanded", "false");
+  }
+
+  const root = document.documentElement;
+  const systemTheme = window.matchMedia?.("(prefers-color-scheme: dark)");
+
+  function getSavedTheme() {
+    try {
+      const saved = window.localStorage.getItem("theme");
+      return saved === "dark" || saved === "light" ? saved : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function applyTheme(theme: "light" | "dark", save = false) {
+    const isDark = theme === "dark";
+    root.toggleAttribute("dark", isDark);
+    root.style.colorScheme = theme;
+    themeButton?.setAttribute("aria-label", isDark ? "Enable light mode" : "Enable dark mode");
+    if (save) {
+      try {
+        window.localStorage.setItem("theme", theme);
+      } catch {
+        // Keep the theme usable when storage is unavailable.
+      }
+    }
+  }
+
+  applyTheme(getSavedTheme() ?? (systemTheme?.matches ? "dark" : "light"));
+  themeButton?.addEventListener("click", () => {
+    applyTheme(root.hasAttribute("dark") ? "light" : "dark", true);
+  });
+  systemTheme?.addEventListener("change", (event) => {
+    if (!getSavedTheme()) applyTheme(event.matches ? "dark" : "light");
+  });
+  window.addEventListener("storage", (event) => {
+    if (event.key === "theme") applyTheme(getSavedTheme() ?? (systemTheme?.matches ? "dark" : "light"));
+  });
+
+  document.querySelectorAll<HTMLAnchorElement>(".social__link[data-social-name]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const eventName = link.dataset.socialName
+        ?.trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      // eslint-disable-next-line no-unused-vars -- `name` is a TypeScript function parameter.
+      const umami = (window as Window & { umami?: { track: (name: string) => void } }).umami;
+      if (eventName) umami?.track(`${eventName}_click`);
+    });
+  });
+
+  document
+    .querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(".form__input:not(.no-cache)")
+    .forEach((input) => {
+      const form = input.form;
+      if (!form?.id || !input.id) return;
+      const storageKey = `${form.id}-content`;
+
+      try {
+        const saved = JSON.parse(window.sessionStorage.getItem(storageKey) ?? "{}") as Record<string, string>;
+        if (Object.hasOwn(saved, input.id)) {
+          if (input instanceof HTMLInputElement && ["checkbox", "radio"].includes(input.type)) {
+            input.checked = saved[input.id] === "on";
+          } else {
+            input.value = saved[input.id];
+          }
+        }
+      } catch {
+        // Ignore stale or unavailable session storage.
+      }
+
+      input.addEventListener("input", () => {
+        try {
+          const saved = JSON.parse(window.sessionStorage.getItem(storageKey) ?? "{}") as Record<string, string>;
+          if (input instanceof HTMLInputElement && ["checkbox", "radio"].includes(input.type)) {
+            const group = input.closest(".form__group") ?? form;
+            group.querySelectorAll<HTMLInputElement>(`input[name="${CSS.escape(input.name)}"]`).forEach((member) => {
+              if (member.id) saved[member.id] = member.checked ? "on" : "off";
+            });
+          } else {
+            saved[input.id] = input.value;
+          }
+          window.sessionStorage.setItem(storageKey, JSON.stringify(saved));
+        } catch {
+          // Keep form input functional when storage is unavailable.
+        }
+      });
+    });
+
+  document
+    .querySelectorAll<HTMLImageElement>(".post__content img, .page__content img, .gallery__image img")
+    .forEach((image) => {
+      if (image.closest("a")) return;
+      image.classList.add("zoomable-image");
+      image.tabIndex = 0;
+      image.setAttribute("role", "button");
+      image.setAttribute("aria-label", `Open image: ${image.alt || "image"}`);
+      image.addEventListener("click", () => openImage(image));
+      image.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openImage(image);
+        }
+      });
+    });
+
+  function openImage(image: HTMLImageElement) {
+    const dialog = document.createElement("dialog");
+    dialog.className = "image-zoom-dialog";
+    dialog.setAttribute("aria-label", image.alt || "Image preview");
+    const zoomedImage = document.createElement("img");
+    zoomedImage.src = image.currentSrc || image.src;
+    zoomedImage.alt = image.alt;
+    dialog.append(zoomedImage);
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", () => dialog.remove(), { once: true });
+    document.body.append(dialog);
+    dialog.showModal();
+  }
+</script>
+
+<style>
+  :global(.zoomable-image) {
+    cursor: zoom-in;
+  }
+
+  :global(.image-zoom-dialog) {
+    width: min(92vw, 1400px);
+    max-width: none;
+    max-height: 92vh;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    background: transparent;
+  }
+
+  :global(.image-zoom-dialog::backdrop) {
+    background: rgba(26, 26, 31, 0.85);
+    backdrop-filter: blur(4px);
+  }
+
+  :global(.image-zoom-dialog img) {
+    display: block;
+    max-width: 92vw;
+    max-height: 92vh;
+    width: auto;
+    height: auto;
+    margin: auto;
+    border-radius: 4px;
+    object-fit: contain;
+    cursor: zoom-out;
+  }
+</style>
+
+<header class="header" id="top">
+  <div class="container">
+    <div class="row">
+      <div class="header__inner col col-12">
+        <div class="logo">
+          <a class="logo__link" href="/">
+            {site.title}
+          </a>
+        </div>
+        <nav class="main-nav" id="main-navigation" aria-hidden="true">
+          <div class="main-nav__box t-panel-slide" data-open="false">
+            <button class="nav__icon-close" type="button" aria-label="Close navigation">
+              <X />
+            </button>
+            <div class="nav__title">{main.title}</div>
+            <ul class="nav__list list-reset">
+              {main.items.map((item) => (
+                <li class={`nav__item`}>
+                  <a href={item.link} class="nav__link">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+        <div class="nav-button">
+          <button class="nav__icon toggle-theme" type="button" aria-label="Enable dark mode">
+            <span class="toggle-moon t-icon" title="Enable dark mode">
+              <Moon />
+            </span>
+            <span class="toggle-sun t-icon" title="Enable light mode">
+              <Sun />
+            </span>
+          </button>
+          <button
+            class="nav__icon icon__search"
+            type="button"
+            aria-label="Open search"
+            aria-controls="site-search"
+            aria-expanded="false"
+          >
+            <Search />
+          </button>
+          <button
+            class="nav__icon icon__menu"
+            type="button"
+            aria-label="Open navigation"
+            aria-controls="main-navigation"
+            aria-expanded="false"
+          >
+            <Menu />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,55 @@
+---
+import DefaultLayout from "./default.astro";
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+const { frontmatter } = Astro.props;
+
+const images = import.meta.glob<ImageMetadata>("/src/assets/**/*.{png,jpg,jpeg,webp,avif}", {
+  eager: true,
+  import: "default",
+});
+
+const image = images[`/src/assets/images/${frontmatter.image}`];
+---
+
+<DefaultLayout
+  noindex={frontmatter.noindex}
+  title={frontmatter.title}
+  description={frontmatter.description}
+  image={image?.src}
+  imageAlt={frontmatter.title}
+  pageType={
+    frontmatter.pageType ??
+    (Astro.url.pathname === "/about/" ? "about" : Astro.url.pathname === "/contact/" ? "contact" : undefined)
+  }
+>
+  <div class="page-head">
+    <div class="container">
+      <div class="row">
+        {image && !frontmatter.hide_image && (
+          <div class="col col-12">
+            <div class="page-image">
+              <Image src={image} alt={frontmatter.title} width="1280" height="720" />
+            </div>
+          </div>
+        )}
+
+        {!frontmatter.hide_title && (
+          <div class="col col-12">
+            <div class="page__info">
+              <h1 class="page__title">{frontmatter.title}</h1>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <div class="container animate">
+    <article class={frontmatter.full_width ? "row" : "page"}>
+      <div class={`page__content${frontmatter.full_width ? " col col-12" : ""}`}>
+        <slot />
+      </div>
+    </article>
+  </div>
+</DefaultLayout>

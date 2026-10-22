@@ -1,0 +1,229 @@
+---
+import { Font } from "astro:assets";
+import { env } from "node:process";
+import sharingImage from "../assets/images/posts/syndikat-sharing-image.png";
+import { site } from "../data/consts";
+
+interface Author {
+  name: string;
+  url?: string;
+  image?: string;
+  twitter?: string;
+  same_as?: string[];
+}
+
+interface FAQ {
+  question: string;
+  answer: string;
+  list?: string[];
+}
+
+interface Props {
+  noindex?: boolean;
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  imageAlt?: string;
+  pageType?: "website" | "article" | "profile" | "faq" | "collection" | "about" | "contact";
+  authors?: Author[];
+  publishedTime?: Date | string;
+  modifiedTime?: Date | string;
+  tags?: string[];
+  author?: Author;
+  faqs?: FAQ[];
+}
+
+const {
+  noindex = false,
+  title,
+  description,
+  canonical,
+  image,
+  imageAlt,
+  pageType = "website",
+  authors = [],
+  publishedTime,
+  modifiedTime,
+  tags = [],
+  author,
+  faqs = [],
+} = Astro.props as Props;
+
+const pageTitle = title ? `${title} – ${site.title}` : site.title;
+const cleanText = (value: string) =>
+  value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+const rawDescription = cleanText(description || site.description);
+const metaDescription = rawDescription.length > 157 ? `${rawDescription.slice(0, 154).trimEnd()}...` : rawDescription;
+const pageUrl = new URL(canonical || Astro.url.pathname, site.url).href;
+const assetBaseUrl = env.CONTEXT !== "production" && env.DEPLOY_PRIME_URL ? env.DEPLOY_PRIME_URL : site.url;
+const imageUrl = new URL(image || sharingImage.src, assetBaseUrl).href;
+const socialImageAlt = imageAlt || title || site.title;
+const toIsoString = (value?: Date | string) => {
+  if (!value) return undefined;
+  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+};
+const publishedAt = toIsoString(publishedTime);
+const modifiedAt = toIsoString(modifiedTime) || publishedAt;
+const authorNames = authors
+  .map((item) => item.name)
+  .filter(Boolean)
+  .join(", ");
+const twitterAuthor = authors.find((item) => item.twitter)?.twitter;
+
+const structuredData: Record<string, unknown>[] = [
+  {
+    "@type": "SportsOrganization",
+    "@id": `${site.url}/#organization`,
+    name: site.title,
+    url: site.url,
+    logo: new URL("/favicon.ico", assetBaseUrl).href,
+  },
+  {
+    "@type": "WebSite",
+    "@id": `${site.url}/#website`,
+    url: site.url,
+    name: site.title,
+    description: cleanText(site.description),
+    inLanguage: "de",
+  },
+];
+
+if (pageType === "article") {
+  structuredData.push({
+    "@type": "BlogPosting",
+    "@id": `${pageUrl}#article`,
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    headline: title || site.title,
+    description: metaDescription,
+    datePublished: publishedAt,
+    dateModified: modifiedAt,
+    inLanguage: "de",
+    isPartOf: { "@id": `${site.url}/#website` },
+    publisher: { "@id": `${site.url}/#organization` },
+    image: { "@type": "ImageObject", url: imageUrl },
+    keywords: tags.length ? tags.join(", ") : undefined,
+    author: authors.map((item) => ({
+      "@type": "Person",
+      "@id": item.url ? `${new URL(item.url, site.url).href}#person` : undefined,
+      name: item.name,
+      url: item.url ? new URL(item.url, site.url).href : undefined,
+      image: item.image ? new URL(item.image, assetBaseUrl).href : undefined,
+      sameAs: item.same_as?.length ? item.same_as : undefined,
+    })),
+  });
+} else if (pageType === "profile" && author) {
+  structuredData.push(
+    {
+      "@type": "ProfilePage",
+      "@id": pageUrl,
+      url: pageUrl,
+      name: title || author.name,
+      description: metaDescription,
+      isPartOf: { "@id": `${site.url}/#website` },
+      mainEntity: { "@id": `${pageUrl}#person` },
+    },
+    {
+      "@type": "Person",
+      "@id": `${pageUrl}#person`,
+      name: author.name,
+      url: pageUrl,
+      worksFor: { "@id": `${site.url}/#organization` },
+      image: author.image ? new URL(author.image, assetBaseUrl).href : undefined,
+      description: description || undefined,
+      sameAs: author.same_as?.length ? author.same_as : undefined,
+    },
+  );
+} else if (pageType === "faq") {
+  structuredData.push({
+    "@type": "FAQPage",
+    "@id": `${pageUrl}#faq`,
+    url: pageUrl,
+    name: title || site.title,
+    description: metaDescription,
+    isPartOf: { "@id": `${site.url}/#website` },
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: cleanText(faq.question),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: cleanText([faq.answer, ...(faq.list || [])].join(" ")),
+      },
+    })),
+  });
+} else {
+  const schemaType =
+    pageType === "collection"
+      ? "CollectionPage"
+      : pageType === "about"
+        ? "AboutPage"
+        : pageType === "contact"
+          ? "ContactPage"
+          : "WebPage";
+  structuredData.push({
+    "@type": schemaType,
+    "@id": pageUrl,
+    url: pageUrl,
+    name: title || site.title,
+    description: metaDescription,
+    inLanguage: "de",
+    isPartOf: { "@id": `${site.url}/#website` },
+    primaryImageOfPage: { "@type": "ImageObject", url: imageUrl },
+  });
+}
+
+const jsonLd = JSON.stringify({ "@context": "https://schema.org", "@graph": structuredData }, null, 2).replace(
+  /</g,
+  "\\u003c",
+);
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<title>{pageTitle}</title>
+<meta name="description" content={metaDescription} />
+<link rel="canonical" href={pageUrl} />
+<link rel="alternate" type="application/atom+xml" title={site.title} href="/feed.xml" />
+<meta property="og:type" content={pageType === "article" ? "article" : "website"} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:url" content={pageUrl} />
+<meta property="og:description" content={metaDescription} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:alt" content={socialImageAlt} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={metaDescription} />
+<meta name="twitter:image" content={imageUrl} />
+<meta name="twitter:image:alt" content={socialImageAlt} />
+{authorNames && <meta name="author" content={authorNames} />}
+{twitterAuthor && <meta name="twitter:creator" content={`@${twitterAuthor}`} />}
+{noindex && <meta name="robots" content="noindex" />}
+{pageType === "article" && (
+  <>
+    {authors.map((item) => item.url && <meta property="article:author" content={new URL(item.url, site.url).href} />)}
+    {publishedAt && <meta property="article:published_time" content={publishedAt} />}
+    {modifiedAt && <meta property="article:modified_time" content={modifiedAt} />}
+    {tags.map((tag) => (
+      <meta property="article:tag" content={tag} />
+    ))}
+  </>
+)}
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.json" />
+<script type="application/ld+json" set:html={jsonLd} />
+{import.meta.env.PROD && (
+  <script
+    is:inline
+    defer
+    src="https://stats.syndikat.golf/script.js"
+    data-website-id="20901b1f-9346-4191-8c70-445a09059c4f"
+    data-do-not-track="true"
+    data-performance="true"
+  />
+)}
+<Font cssVariable="--font-jost" preload />

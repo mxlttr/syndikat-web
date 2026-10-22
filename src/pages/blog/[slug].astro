@@ -1,0 +1,125 @@
+---
+import { getCollection, render, getEntry } from "astro:content";
+import { Image } from "astro:assets";
+import DefaultLayout from "../../layouts/default.astro";
+import PostShare from "../../components/PostShare.astro";
+import { getPostDate, getPostExcerpt, getPostUrl } from "../../utils/posts";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+
+const authors = await Promise.all(
+  [...post.data.authors, post.data.author]
+    .filter((id): id is string => typeof id === "string")
+    .map((id) => getEntry("authors", id)),
+);
+
+const { Content } = await render(post);
+const postAuthors = authors
+  .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+  .map((entry) => ({
+    name: entry.data.name,
+    url: entry.data.url,
+    image: entry.data.image?.src,
+    twitter: entry.data.twitter,
+    same_as: entry.data.same_as,
+  }));
+const postDate = getPostDate(post);
+const postTags = post.data.tags?.split(/\s+/).filter(Boolean) ?? [];
+---
+
+<DefaultLayout
+  title={post.data.title}
+  description={post.data.description || post.data.excerpt || getPostExcerpt(post, 157)}
+  canonical={getPostUrl(post)}
+  image={post.data.image.src}
+  imageAlt={post.data.title}
+  pageType="article"
+  authors={postAuthors}
+  publishedTime={postDate || undefined}
+  modifiedTime={postDate || undefined}
+  tags={postTags}
+>
+  <div class="post-head">
+    <div class="container">
+      <div class="row">
+        <div class={`col col-${post.data.video ? "12" : "6"} col-d-12`}>
+          {post.data.video ? (
+            <div class="post-video">
+              <div class="post-video__wrap">
+                <iframe
+                  src={`https://www.youtube.com/embed/${post.data.video}`}
+                  loading="lazy"
+                  width="640"
+                  height="360"
+                />
+              </div>
+            </div>
+          ) : (
+            <div class="post-image">
+              <Image src={post.data.image} alt={post.data.title} width="640" height="360" />
+            </div>
+          )}
+        </div>
+        <div class={`col col-${post.data.video ? "12" : "6"} col-d-12`}>
+          <div class={`post__info${post.data.video ? " post__info-video" : ""}`}>
+            <div class="post__tags">{post.data.tags && <span class="post__tag">{post.data.tags}</span>}</div>
+            <h1 class="post__title">{post.data.title}</h1>
+            <div class="post__meta">
+              {authors?.map((author, index) => (
+                <>
+                  <span class="post__author-image">
+                    {author?.data.image && (
+                      <Image src={author.data.image} alt={author.data.name} width="50" height="50" />
+                    )}
+                  </span>
+
+                  <div class="post__meta-bottom">
+                    {author?.data.url ? (
+                      <a href={author?.data.url} rel="author" class="post__author">
+                        {author?.data.name}
+                      </a>
+                    ) : author?.data.twitter ? (
+                      <a href={`//twitter.com/${author?.data.twitter}`} rel="author" class="post__author">
+                        {author?.data.name}
+                      </a>
+                    ) : (
+                      <span class="post__author author">{author?.data.name}</span>
+                    )}
+                    {index === 0 ? (
+                      <time class="post__date" datetime={getPostDate(post)?.toISOString() ?? null}>
+                        {getPostDate(post)?.toLocaleDateString("de-DE", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </time>
+                    ) : (
+                      <span class="post__date">Co-Autor</span>
+                    )}
+                  </div>
+                </>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container animate">
+    <article class="post">
+      <div class="post__content">
+        <Content />
+      </div>
+      <PostShare post={post} />
+    </article>
+  </div>
+</DefaultLayout>
