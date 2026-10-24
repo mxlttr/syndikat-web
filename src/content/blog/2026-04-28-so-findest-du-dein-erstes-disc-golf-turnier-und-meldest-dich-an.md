@@ -123,7 +123,7 @@ Die meisten sind beim ersten Turnier nervös, treffen ein paar schlechte Entsche
 
 ### 3. Equipment sinnvoll vorbereiten
 
-Du musst nicht alles besitzen, aber du solltest nicht völlig planlos anreisen. Für die konkrete Vorbereitung hilft dir unser Beitrag zur [Turnier-Packliste](/blog/turnier-equipment-das-den-unterschied-macht/).
+Du musst nicht alles besitzen, aber du solltest nicht völlig planlos anreisen. Für die konkrete Vorbereitung hilft dir unser Beitrag zur [Turnier-Packliste](/blog/turnier-packliste/).
 
 ## Unsere Vereinsperspektive auf das erste Turnier
 
