@@ -1,0 +1,44 @@
+---
+import DefaultLayout from "../../layouts/default.astro";
+import PostsList from "../../components/PostsList.astro";
+import Pagination from "../../components/Pagination.astro";
+import { getCollection } from "astro:content";
+import type { GetStaticPaths, Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+import { getPostDate } from "../../utils/posts";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getCollection("blog");
+
+  posts.sort((a, b) => (getPostDate(b)?.getTime() ?? 0) - (getPostDate(a)?.getTime() ?? 0));
+
+  return paginate(posts, { pageSize: 6 });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<CollectionEntry<"blog">>;
+}
+
+const { page } = Astro.props;
+---
+
+<DefaultLayout
+  title="Disc Golf Blog aus Köln"
+  description="Berichte, Tipps und Geschichten rund um Disc Golf, Turniere und das Vereinsleben des Disc Golf Syndikat in Köln."
+  pageType="collection"
+>
+  <div class="page-head">
+    <div class="container">
+      <div class="row">
+        <div class="col col-12">
+          <div class="page__info">
+            <h1 class="page__title">Disc Golf Blog aus Köln</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <PostsList posts={page.data} />
+  <Pagination page={page} />
+</DefaultLayout>

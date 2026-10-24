@@ -1,0 +1,42 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { tools } from "../data/menus.ts";
+
+const images = import.meta.glob<ImageMetadata>("/src/assets/images/**/*.{png,jpg,jpeg,webp,avif}", {
+  eager: true,
+  import: "default",
+});
+---
+
+<section class="section section-tools" id="tools">
+  <div class="container">
+    <div class="row">
+      <div class="col col-12">
+        <div class="section__head">
+          <h3 class="section__title">Tools</h3>
+        </div>
+        <div class="row">
+          {tools
+            .reverse()
+            .filter((item) => !item.hide_index)
+            .map((item) => {
+              return (
+                <div class="col col-3 col-d-6 col-m-12">
+                  <a href={item.url} class="tag-image">
+                    <span class="tag-name">{item.title}</span>
+                    <Image
+                      src={images[`/src/assets/images/${item.thumbnail}`]}
+                      alt={item.title}
+                      width={300}
+                      height={200}
+                    />
+                  </a>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,55 @@
+---
+import BrandIcon from "./icons/BrandIcons.astro";
+import { site } from "../data/consts";
+import { getPostExcerpt } from "../utils/posts";
+const { post } = Astro.props;
+---
+
+<div class="post__share">
+  <ul class="share__list list-reset">
+    <li class="share__item">
+      <a
+        class="share__link share__twitter"
+        href={`https://twitter.com/intent/tweet?text=${post.data.title}&url=${site.url + "/blog/" + post.id}`}
+        onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+        title="Share on Twitter"
+        rel="nofollow"
+      >
+        <BrandIcon name="twitter" />
+      </a>
+    </li>
+    <li class="share__item">
+      <a
+        class="share__link share__facebook"
+        href={`https://www.facebook.com/sharer/sharer.php?u=${site.url + "/blog/" + post.id}`}
+        onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+        title="Share on Facebook"
+        rel="nofollow"
+      >
+        <BrandIcon name="facebook" />
+      </a>
+    </li>
+    <li class="share__item">
+      <a
+        class="share__link share__pinterest"
+        href={`http://pinterest.com/pin/create/button/?url=${site.url + "/blog/" + post.id}&media=${post.data.image.src}&description=${post.data.title}`}
+        onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+        title="Share on Pinterest"
+        rel="nofollow"
+      >
+        <BrandIcon name="pinterest" />
+      </a>
+    </li>
+    <li class="share__item">
+      <a
+        class="share__link share__linkedin"
+        href={`https://www.linkedin.com/shareArticle?mini=true&url=${site.url + "/blog/" + post.id}&title=${post.data.title}&summary=${getPostExcerpt(post, 92)}&source=${site.title}`}
+        onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+        title="Share on LinkedIn"
+        rel="nofollow"
+      >
+        <BrandIcon name="linkedin" />
+      </a>
+    </li>
+  </ul>
+</div>

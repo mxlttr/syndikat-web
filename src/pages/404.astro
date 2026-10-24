@@ -1,0 +1,36 @@
+---
+import DefaultLayout from "../layouts/default.astro";
+---
+
+<DefaultLayout noindex title="Seite nicht gefunden">
+  <div class="page-head text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col col-12">
+          <div class="page__info">
+            <h1 class="page__title">Ups, diese Seite gibt es nicht.</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container animate text-center">
+    <article class="page">
+      <div class="page__content">
+        <p>Der Link ist möglicherweise veraltet oder die Adresse wurde nicht ganz richtig eingegeben.</p>
+        <p>
+          <a class="button button--primary" href="/">
+            Zur Startseite
+          </a>
+          <a class="button" href="/events/">
+            Zu den Events
+          </a>
+        </p>
+        <p>
+          Oder entdecke unseren <a href="/blog/">Blog</a>, den <a href="/preisvergleich/">Preisvergleich</a> oder&nbsp;
+          <a href="/contact/">schreib uns</a>, wenn du Hilfe brauchst.
+        </p>
+      </div>
+    </article>
+  </div>
+</DefaultLayout>

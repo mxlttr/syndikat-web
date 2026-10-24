@@ -1,0 +1,12 @@
+---
+import checklistItems from "../data/checklist";
+---
+
+<details>
+  <summary>Turnier-Packliste</summary>
+  <ul>
+    {checklistItems.map((item) => (
+      <li>{item}</li>
+    ))}
+  </ul>
+</details>

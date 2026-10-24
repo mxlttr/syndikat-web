@@ -1,0 +1,61 @@
+type FAQ = {
+  question: string;
+  answer: string;
+  list?: string[];
+};
+
+export const faqs: FAQ[] = [
+  {
+    question: "Was ist Disc Golf?",
+    answer:
+      "Disc Golf ist ein Präzisionssport, der dem traditionellen Golf ähnelt, jedoch anstatt eines Balls mit einer speziell fliegenden Scheibe gespielt wird. Wie beim klassischen Golf gibt es auch hier Driver und Putter. Ziel des Spiels ist es, die Scheibe in einen Korb zu werfen.",
+  },
+  {
+    question: "Was ist ein Disc Golf-Verein?",
+    answer:
+      "Ein Disc Golf-Verein ist eine Gruppe von Disc Golf-Enthusiasten, die sich zusammengeschlossen haben, um die Entwicklung und Förderung des Sports in ihrer Stadt voranzutreiben. Der Verein organisiert Disc Golf-Veranstaltungen, errichtet und pflegt neue Kurse und bietet Anfänger- und Fortgeschrittenenkurse an.",
+  },
+  {
+    question: "Wie kann ich Mitglied im Disc Golf-Verein werden?",
+    answer: `Um Mitglied im Disc Golf-Verein zu werden, musst Du Dich an den Verein wenden und <a href="/register/">Dich für eine Mitgliedschaft anmelden</a>. Zusätzlich haben wir einen Discord-Server, auf dem wir uns regelmäßig austauschen. Die Mitgliedschaft kann verschiedene Vorteile beinhalten, wie zum Beispiel vergünstigte Rabatte in Disc-Golf-Shops, Zugang zu Turnieren und vieles mehr.`,
+  },
+  {
+    question: "Wie finde ich Disc Golf-Plätze in meiner Nähe?",
+    answer: `Du kannst Disc Golf-Plätze in Deiner Nähe auf verschiedenen Websites wie <a href="https://udisc.com" target="_blank" rel="noopener noreferrer">UDisc.com</a> oder <a href="https://www.pdga.com/course-directory" target="_blank" rel="noopener noreferrer">PDGA.com</a> finden. Du kannst auch Deinen lokalen Disc Golf-Verein kontaktieren und Informationen über die Kurse in Deiner Umgebung erhalten.`,
+  },
+  {
+    question: "Muss ich meine eigene Ausrüstung mitbringen, um Disc Golf zu spielen?",
+    answer: `Mit etwas Glück leihen Dir Spieler vor Ort ein paar Scheiben oder es gibt einen Verleih vor Ort. Wenn Du jedoch häufig spielen möchtest, ist es empfehlenswert, Deine eigenen Discs, neu oder gebraucht, zu kaufen. Einige Disc Golf-Vereine bieten auch Rabatte für Mitglieder beim Kauf von Discs und anderen Ausrüstungen an.`,
+  },
+  {
+    question: "Kann ich Disc Golf alleine spielen oder brauche ich eine Gruppe?",
+    answer:
+      "Du kannst Disc Golf alleine spielen oder in einer Gruppe. Einige Spieler bevorzugen es, alleine zu spielen, während andere lieber in Gruppen spielen. Es hängt ganz von Deinen persönlichen Vorlieben ab.",
+  },
+  {
+    question: "Wie lange dauert eine Disc Golf-Runde?",
+    answer:
+      "Die Dauer einer Disc Golf-Runde hängt von verschiedenen Faktoren ab, wie zum Beispiel der Anzahl der Spieler, der Größe des Kurses und der Schwierigkeit der Bahnen. Im Allgemeinen dauert eine Runde ein bis zwei Stunden.",
+  },
+  {
+    question: "Kann ich als Anfänger Disc Golf spielen?",
+    answer:
+      "Ja, jeder kann Disc Golf spielen, unabhängig vom Alter oder der Erfahrung. Viele Disc Golf-Plätze haben Kurse für Anfänger und Fortgeschrittene, und es gibt oft erfahrene Spieler, die bereit sind, Anfänger zu unterstützen und Tipps zu geben.",
+  },
+  {
+    question: "Wie kann ich an Disc Golf-Turnieren teilnehmen?",
+    answer:
+      "Du kannst an Disc Golf-Turnieren teilnehmen, indem Du Dich auf der Website des Veranstalters anmeldest. Einige Turniere haben spezielle Qualifikationsanforderungen, während andere für alle offen sind.",
+  },
+  {
+    question: "Wie kann ich mehr über Disc Golf lernen?",
+    answer: "Es gibt viele Möglichkeiten, mehr über Disc Golf zu erfahren, darunter:",
+    list: [
+      "Besuche einen Disc Golf-Platz und spiele eine Runde mit erfahrenen Spielern, die bereit sind, Dir Tipps zu geben.",
+      `Schau Dir Videos auf YouTube an, um verschiedene Techniken und Strategien zu lernen. Empfehlenswert ist der Kanal <a href="https://www.youtube.com/channel/UCmGyCEbHfY91NFwHgioNLMQ" target="_blank" rel="noopener noreferrer">Jomez</a>.`,
+      "Besuche Online-Foren und Blog-Beiträge, um Dich mit anderen Spielern auszutauschen und Informationen zu erhalten.",
+      "Tritt einem Disc Golf-Verein bei und nimm an Trainings und Veranstaltungen teil.",
+      `Schau Dir Live-Übertragungen auf YouTube (<a href="https://www.youtube.com/discgolfprotour" rel="noopener noreferrer" target="_blank">Disc Golf Network</a>) von professionellen Disc Golf-Turnieren an, um von den Besten zu lernen.`,
+    ],
+  },
+];

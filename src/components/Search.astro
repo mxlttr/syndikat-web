@@ -1,0 +1,197 @@
+---
+import { X } from "@lucide/astro";
+---
+
+<div class="search" id="site-search" aria-hidden="true">
+  <div class="container">
+    <div class="row">
+      <div class="col col-12">
+        <div class="search__box">
+          <div class="search__group">
+            <button class="search__close" type="button" data-search-close aria-label="Close search">
+              <X />
+            </button>
+            <label for="js-search-input" class="screen-reader-text">
+              Durchsuche die Website
+            </label>
+            <input
+              type="search"
+              id="js-search-input"
+              class="search__text"
+              autocomplete="off"
+              placeholder="Suchen …"
+              aria-controls="js-results-container"
+              aria-label="Website durchsuchen"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div
+      class="row search-results-list"
+      id="js-results-container"
+      role="region"
+      aria-label="Suchergebnisse"
+      aria-live="polite"
+    ></div>
+  </div>
+</div>
+
+<script>
+  type SearchResult = {
+    title: string;
+    url: string;
+    date: string;
+    tags: string[];
+    excerpt: string;
+    content: string;
+    image: string;
+  };
+
+  const searchInput = document.querySelector<HTMLInputElement>("#js-search-input");
+  const resultsContainer = document.querySelector<HTMLDivElement>("#js-results-container");
+  const searchPanel = document.querySelector<HTMLElement>("#site-search");
+  const openButton = document.querySelector<HTMLButtonElement>(".icon__search");
+  const closeButton = document.querySelector<HTMLButtonElement>("[data-search-close]");
+  let indexPromise: Promise<SearchResult[]> | undefined;
+
+  function loadIndex() {
+    indexPromise ??= fetch("/search.json")
+      .then((response) => {
+        if (!response.ok) throw new Error(`Search index request failed (${response.status})`);
+        return response.json() as Promise<SearchResult[]>;
+      })
+      .catch((error) => {
+        indexPromise = undefined;
+        throw error;
+      });
+    return indexPromise;
+  }
+
+  function renderResults(results: SearchResult[]) {
+    if (!resultsContainer) return;
+    resultsContainer.replaceChildren();
+
+    if (!results.length) {
+      const message = document.createElement("h3");
+      message.className = "no-results";
+      message.textContent = "Keine Ergebnisse gefunden";
+      resultsContainer.append(message);
+      return;
+    }
+
+    for (const result of results) {
+      const card = document.createElement("article");
+      card.className = "article col col-4 col-d-6 col-t-12";
+      const inner = document.createElement("div");
+      inner.className = "article__inner";
+      const head = document.createElement("div");
+      head.className = "article__head";
+
+      if (result.date) {
+        const time = document.createElement("time");
+        time.className = "article__date";
+        time.dateTime = result.date;
+        time.textContent = new Intl.DateTimeFormat("de-DE", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(result.date));
+        head.append(time);
+      }
+
+      if (result.image) {
+        const imageLink = document.createElement("a");
+        imageLink.className = "article__image";
+        imageLink.href = result.url;
+        const image = document.createElement("img");
+        image.src = result.image;
+        image.alt = result.title;
+        image.width = 350;
+        image.height = 233;
+        image.loading = "lazy";
+        imageLink.append(image);
+        head.append(imageLink);
+      }
+
+      const content = document.createElement("div");
+      content.className = "article__content";
+      const title = document.createElement("h2");
+      title.className = "article__title";
+      const titleLink = document.createElement("a");
+      titleLink.href = result.url;
+      titleLink.textContent = result.title;
+      title.append(titleLink);
+      content.append(title);
+      if (result.excerpt) {
+        const excerpt = document.createElement("p");
+        excerpt.className = "article__excerpt";
+        excerpt.textContent = result.excerpt;
+        content.append(excerpt);
+      }
+
+      inner.append(head, content);
+      card.append(inner);
+      resultsContainer.append(card);
+    }
+  }
+
+  async function updateResults() {
+    if (!searchInput || !resultsContainer) return;
+    const query = searchInput.value.trim().toLocaleLowerCase("de");
+    resultsContainer.replaceChildren();
+    if (query.length < 2) return;
+
+    resultsContainer.setAttribute("aria-busy", "true");
+    try {
+      const index = await loadIndex();
+      if (searchInput.value.trim().toLocaleLowerCase("de") !== query) return;
+      const terms = query.split(/\s+/);
+      const matches = index
+        .map((item) => ({
+          item,
+          text: `${item.title} ${item.tags.join(" ")} ${item.excerpt} ${item.content}`.toLocaleLowerCase("de"),
+        }))
+        .filter(({ text }) => terms.every((term) => text.includes(term)))
+        .slice(0, 12)
+        .map(({ item }) => item);
+      renderResults(matches);
+    } catch {
+      const message = document.createElement("h3");
+      message.className = "no-results";
+      message.textContent = "Die Suche ist gerade nicht verfügbar.";
+      resultsContainer.replaceChildren(message);
+    } finally {
+      resultsContainer.removeAttribute("aria-busy");
+    }
+  }
+
+  function openSearch() {
+    searchPanel?.classList.add("is-visible");
+    searchPanel?.setAttribute("aria-hidden", "false");
+    openButton?.setAttribute("aria-expanded", "true");
+    window.setTimeout(() => searchInput?.focus(), 250);
+  }
+
+  function closeSearch() {
+    searchPanel?.classList.remove("is-visible");
+    searchPanel?.setAttribute("aria-hidden", "true");
+    openButton?.setAttribute("aria-expanded", "false");
+    openButton?.focus();
+  }
+
+  searchInput?.addEventListener("input", () => void updateResults());
+  searchInput?.addEventListener("focus", () => {
+    if (searchInput.value.trim().length >= 2) void updateResults();
+  });
+  openButton?.addEventListener("click", openSearch);
+  closeButton?.addEventListener("click", closeSearch);
+  searchPanel?.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeSearch();
+  });
+  searchPanel?.querySelector(".search__box")?.addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) closeSearch();
+  });
+</script>

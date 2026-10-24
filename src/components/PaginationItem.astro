@@ -1,0 +1,18 @@
+---
+interface Props {
+  href?: string;
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+{href ? (
+  <a href={href} class={className}>
+    <slot />
+  </a>
+) : (
+  <span class:list={[className, "disabled"]}>
+    <slot />
+  </span>
+)}
