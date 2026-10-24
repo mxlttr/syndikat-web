@@ -19,7 +19,7 @@ Der wichtigste Anlaufpunkt für viele Spieler in Köln ist der Kurs an der Schei
 
 Über unsere <a href="/events/" data-umami-event="koeln_weekly_click">Events</a> findest du den direktesten Einstieg in die wöchentliche Liga. Genau dort solltest du anfangen, wenn du in Köln schnell Leute kennenlernen und eine erste Runde mitnehmen willst.
 
-Neben dem Kurs gibt es in Köln inzwischen auch die [Putting-Anlage im Sportpionierpark](/blog/neue-putting-anlage-im-sportpionierpark-koeln/). Sie ist keine komplette Runde wie an der Scheibenstraße, aber eine spannende Ergänzung für kurze Sessions, Technikarbeit und lockeres Putten.
+Neben dem Kurs gibt es in Köln inzwischen auch die [Putting-Anlage im Sportpionierpark](/blog/sportpionierpark/). Sie ist keine komplette Runde wie an der Scheibenstraße, aber eine spannende Ergänzung für kurze Sessions, Technikarbeit und lockeres Putten.
 
 ## Für wen ist Disc Golf in Köln geeignet?
 
