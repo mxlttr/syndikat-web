@@ -22,6 +22,12 @@
   let searchRun = 0;
   let completedStores = new Set();
 
+  function trackEvent(eventName, data = {}) {
+    if (typeof window !== "undefined" && window.umami) {
+      window.umami.track(eventName, data);
+    }
+  }
+
   let discs = [];
 
   window.addEventListener("awesomplete-selectcomplete", (event) => {
@@ -156,6 +162,14 @@
       onEnd: () => {
         if (currentRun !== searchRun) return;
         shopCount = totalStores;
+        const productCount = initialProducts.length;
+        trackEvent("product_search_completed", {
+          query: normalizedQuery,
+          product_count: productCount,
+        });
+        if (productCount === 0) {
+          trackEvent("product_search_no_results", { query: normalizedQuery });
+        }
         finishSearch();
       },
       onServerError: () => {
@@ -171,6 +185,8 @@
     if (!activeSource) {
       console.error("Streaming search is not supported in this browser.");
       finishSearch();
+    } else {
+      trackEvent("product_search", { query: normalizedQuery });
     }
   };
 

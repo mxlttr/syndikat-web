@@ -16,6 +16,7 @@
   let noResultsEventKey = "";
   let searchInputElement;
   let ratingsController;
+  let ratingsLoadedTracked = false;
   const pageSize = 50;
   let currentPage = 1;
   let totalPlayers = 0;
@@ -89,6 +90,10 @@
         totalPlayers = result.total;
         divisions = result.divisions;
         currentPage = requestedPage;
+        if (!ratingsLoadedTracked) {
+          ratingsLoadedTracked = true;
+          trackEvent("ratings_loaded", { resultCount: result.total });
+        }
       })
       .catch((err) => {
         if (err.name !== "AbortError") {
@@ -185,6 +190,7 @@
         rating: player.rating,
         divisionRank: player.divisionRank,
       };
+      trackEvent("player_loaded", { gt_number: Number(id) });
     } catch (err) {
       window.Sentry?.captureException(err);
       playerError = true;
