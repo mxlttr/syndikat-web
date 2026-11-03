@@ -1,3 +1,11 @@
+// Page language (from <html lang>), shared by all page scripts loaded after this file.
+const PAGE_LANG = document.documentElement.lang === "en" ? "en" : "de";
+const PAGE_LOCALE = PAGE_LANG === "en" ? "en-GB" : "de-DE";
+
+function localize(strings) {
+  return strings[PAGE_LANG] ?? strings.de;
+}
+
 const DEFAULT_DEV_API_URL = "http://localhost:8080";
 const DEFAULT_PROD_API_URL = "https://api.syndikat.golf";
 
@@ -191,9 +199,9 @@ document.addEventListener("DOMContentLoaded", function () {
     SimpleJekyllSearch({
       searchInput: searchInputEl,
       resultsContainer: searchResultsEl,
-      json: "/search.json",
+      json: searchInputEl.dataset.searchJson || "/search.json",
       searchResultTemplate: '{article}',
-      noResultsText: '<h3 class="no-results">No results found</h3>'
+      noResultsText: `<h3 class="no-results">${localize({ de: "Keine Ergebnisse gefunden", en: "No results found" })}</h3>`
     });
   }
 
@@ -376,7 +384,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then(data => {
         if (!data.length) {
-          onTourStatus.textContent = 'Derzeit sind keine Spieler*innen des Syndikats auf Tour.';
+          onTourStatus.textContent = localize({ de: 'Derzeit sind keine Spieler*innen des Syndikats auf Tour.', en: 'No Syndikat players are currently on tour.' });
           return;
         }
 
@@ -398,9 +406,9 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           row.innerHTML = `
             <td data-label="Status"><span class="tournaments-table__indicator${registrationStatus ? " is-active" : ""}" data-registration-status="${escapeAttribute(registrationStatus)}" aria-label="${escapeAttribute(registrationStatus || "n/a")}"></span></td>
-            <td data-label="Turnier"><div class="tournaments-table__name-cell"><span class="avatar tournaments-table__avatar" style="background-color: ${escapeAttribute(avatarColor)};"><span>${escapeHtml(initials)}</span></span><div class="tournaments-table__heading"><div class="tournaments-table__title">${escapeHtml(tournament.title || "Unbenanntes Turnier")}</div></div></div></td>
-            <td data-label="Datum">${formatTournamentDateCell(tournament)}</td>
-            <td data-label="Spieler*innen">${playerList}</td>
+            <td data-label="${localize({ de: 'Turnier', en: 'Tournament' })}"><div class="tournaments-table__name-cell"><span class="avatar tournaments-table__avatar" style="background-color: ${escapeAttribute(avatarColor)};"><span>${escapeHtml(initials)}</span></span><div class="tournaments-table__heading"><div class="tournaments-table__title">${escapeHtml(tournament.title || localize({ de: "Unbenanntes Turnier", en: "Untitled tournament" }))}</div></div></div></td>
+            <td data-label="${localize({ de: 'Datum', en: 'Date' })}">${formatTournamentDateCell(tournament)}</td>
+            <td data-label="${localize({ de: 'Spieler*innen', en: 'Players' })}">${playerList}</td>
           `;
 
           row.addEventListener('click', () => {
@@ -422,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch(error => {
         console.error('Error fetching on-tour data:', error);
-        onTourStatus.textContent = 'Die Turnierdaten sind zurzeit nicht verfügbar. Bitte versuche es später erneut.';
+        onTourStatus.textContent = localize({ de: 'Die Turnierdaten sind zurzeit nicht verfügbar. Bitte versuche es später erneut.', en: 'Tournament data is currently unavailable. Please try again later.' });
       });
   }
 
@@ -437,14 +445,14 @@ function formatDate(date, weekday = true, year = true) {
     day: "2-digit"
   };
 
-  return new Date(date).toLocaleDateString("de-DE", dateOptions);
+  return new Date(date).toLocaleDateString(PAGE_LOCALE, dateOptions);
 }
 
 function formatTournamentDateCell(tournament) {
   const start = tournament?.dates?.startTournament;
   const end = tournament?.dates?.endTournament;
 
-  if (!start) return '<span class="tournaments-table__date">noch unbekannt</span>';
+  if (!start) return `<span class="tournaments-table__date">${localize({ de: "noch unbekannt", en: "not yet known" })}</span>`;
   if (!end || start === end) {
     return `<span class="tournaments-table__date">${escapeHtml(formatDate(start, false))}</span>`;
   }
@@ -525,7 +533,7 @@ function getTournamentWeek(dateValue) {
   monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
   const sunday = new Date(monday);
   sunday.setUTCDate(sunday.getUTCDate() + 6);
-  const format = value => value.toLocaleDateString('de-DE', {
+  const format = value => value.toLocaleDateString(PAGE_LOCALE, {
     timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric'
   });
   return {key: monday.toISOString(), label: `${format(monday)} – ${format(sunday)}`};
@@ -536,7 +544,7 @@ function renderTournamentWeeks(tournaments, columnCount, renderRow) {
   for (const tournament of tournaments) {
     const week = getTournamentWeek(tournament?.dates?.startTournament);
     const key = week?.key || 'unknown';
-    if (!groups.has(key)) groups.set(key, {label: week?.label || 'Datum noch unbekannt', tournaments: []});
+    if (!groups.has(key)) groups.set(key, {label: week?.label || localize({ de: 'Datum noch unbekannt', en: 'Date not yet known' }), tournaments: []});
     groups.get(key).tournaments.push(tournament);
   }
 

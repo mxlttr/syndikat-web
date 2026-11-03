@@ -3,7 +3,7 @@ import path from 'node:path';
 import critical from 'critical';
 
 const siteDir = path.resolve('_site');
-const directCriticalRoutes = new Set([
+const baseCriticalRoutes = [
   '/',
   '/about/',
   '/bagtags/',
@@ -18,7 +18,11 @@ const directCriticalRoutes = new Set([
   '/tools/',
   '/training/',
   '/turniere/',
-]);
+];
+const languagePrefixes = ['', '/en'];
+const directCriticalRoutes = new Set(
+  languagePrefixes.flatMap((prefix) => baseCriticalRoutes.map((route) => `${prefix}${route}`)),
+);
 
 const blogSourceRoute = '/blog/die-besten-scheiben-fuer-discgolf-einsteiger/';
 const stylesheet = ['normalize.css', 'style.min.css']
@@ -106,7 +110,7 @@ async function inlineSharedCriticalCss(htmlFiles) {
     const css = await generateCriticalCss(sourceFile);
     const blogFiles = htmlFiles.filter((file) => {
       const route = filePathToRoute(file);
-      return route.startsWith('/blog/') && !/^\/blog\/(?:page\d+\/)?$/.test(route);
+      return /^(?:\/en)?\/blog\//.test(route) && !/^(?:\/en)?\/blog\/(?:page\d+\/)?$/.test(route);
     });
 
     for (const file of blogFiles) {

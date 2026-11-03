@@ -1,5 +1,6 @@
 <script>
   import { TrendingDown, TrendingUp } from "lucide-svelte";
+  import { l, locale } from "./i18n.js";
 
   export let ratings = [];
   export let playerName = "";
@@ -8,10 +9,10 @@
   const chartMargins = { top: 20, right: 20, bottom: 42, left: 64 };
   const yearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
   const rangeOptions = [
-    { id: "ytd", label: "YTD", periodDescription: "seit Jahresbeginn" },
-    { id: "1y", label: "1Y", periodDescription: "im letzten Jahr" },
-    { id: "3y", label: "3Y", periodDescription: "in den letzten 3 Jahren" },
-    { id: "all", label: "Alle", periodDescription: "insgesamt" },
+    { id: "ytd", label: "YTD", periodDescription: l({ de: "seit Jahresbeginn", en: "year to date" }) },
+    { id: "1y", label: "1Y", periodDescription: l({ de: "im letzten Jahr", en: "in the last year" }) },
+    { id: "3y", label: "3Y", periodDescription: l({ de: "in den letzten 3 Jahren", en: "in the last 3 years" }) },
+    { id: "all", label: l({ de: "Alle", en: "All" }), periodDescription: l({ de: "insgesamt", en: "overall" }) },
   ];
   let activePoint = null;
   let selectedRange = "1y";
@@ -21,18 +22,18 @@
     const date = new Date(value);
     return Number.isNaN(date.getTime())
       ? "–"
-      : date.toLocaleDateString("de-DE", { year: "numeric", month: "2-digit", day: "2-digit" });
+      : date.toLocaleDateString(locale, { year: "numeric", month: "2-digit", day: "2-digit" });
   }
 
   function formatRating(value) {
-    return new Intl.NumberFormat("de-DE", {
+    return new Intl.NumberFormat(locale, {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,
     }).format(Number(value));
   }
 
   function formatPercentage(value) {
-    return new Intl.NumberFormat("de-DE", {
+    return new Intl.NumberFormat(locale, {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,
     }).format(Number(value));
@@ -81,7 +82,7 @@
     const lastRating = points[points.length - 1].numericRating;
     const change = lastRating - firstRating;
     const percentage = firstRating ? (change / firstRating) * 100 : 0;
-    const rangeDescription = rangeOptions.find((option) => option.id === range)?.periodDescription ?? "insgesamt";
+    const rangeDescription = rangeOptions.find((option) => option.id === range)?.periodDescription ?? rangeOptions[rangeOptions.length - 1].periodDescription;
 
     return {
       change: points.length === 1 ? null : change,
@@ -119,7 +120,10 @@
         x: average("x"),
         y: average("y"),
         numericRating: average("numericRating"),
-        ariaLabel: `${group.length} gebündelte Ratingspunkte zwischen ${formatDate(first.date)} und ${formatDate(last.date)}, Durchschnitt ${formatRating(average("numericRating"))}`,
+        ariaLabel: l({
+          de: `${group.length} gebündelte Ratingspunkte zwischen ${formatDate(first.date)} und ${formatDate(last.date)}, Durchschnitt ${formatRating(average("numericRating"))}`,
+          en: `${group.length} grouped rating points between ${formatDate(first.date)} and ${formatDate(last.date)}, average ${formatRating(average("numericRating"))}`,
+        }),
         dateLabel: `${formatDate(first.date)} – ${formatDate(last.date)}`,
         ratingLabel: `Ø ${formatRating(average("numericRating"))}`,
         pointCount: group.length,
@@ -168,12 +172,14 @@
 </script>
 
 {#if chart}
-  <div class="rating-history" aria-label="Historischer Ratingverlauf">
+  <div class="rating-history" aria-label={l({ de: "Historischer Ratingverlauf", en: "Rating history" })}>
     {#if trendSummary}
       <div class="rating-history__header">
-        <div class="rating-history__quote" aria-label={trendSummary.singlePoint ? `Aktuelles Rating ${formatRating(trendSummary.lastRating)}; keine Vergleichsdaten ${trendSummary.label}` : `Aktuelles Rating ${formatRating(trendSummary.lastRating)}, Veränderung ${trendSummary.change >= 0 ? "plus" : "minus"} ${formatRating(Math.abs(trendSummary.change))} Punkte ${trendSummary.label}`}>
+        <div class="rating-history__quote" aria-label={trendSummary.singlePoint
+          ? l({ de: `Aktuelles Rating ${formatRating(trendSummary.lastRating)}; keine Vergleichsdaten ${trendSummary.label}`, en: `Current rating ${formatRating(trendSummary.lastRating)}; no comparison data ${trendSummary.label}` })
+          : l({ de: `Aktuelles Rating ${formatRating(trendSummary.lastRating)}, Veränderung ${trendSummary.change >= 0 ? "plus" : "minus"} ${formatRating(Math.abs(trendSummary.change))} Punkte ${trendSummary.label}`, en: `Current rating ${formatRating(trendSummary.lastRating)}, change ${trendSummary.change >= 0 ? "plus" : "minus"} ${formatRating(Math.abs(trendSummary.change))} points ${trendSummary.label}` })}>
           {#if trendSummary.singlePoint}
-            <span class="rating-history__period">Keine Vergleichsdaten für diesen Zeitraum</span>
+            <span class="rating-history__period">{l({ de: "Keine Vergleichsdaten für diesen Zeitraum", en: "No comparison data for this period" })}</span>
           {:else}
             <span class:rating-history__change--down={trendSummary.direction === "down"} class="rating-history__change">
               {#if trendSummary.direction === "up"}
@@ -181,11 +187,11 @@
               {:else}
                 <TrendingDown size={14} strokeWidth={2.5} aria-hidden="true" />
               {/if}
-              {trendSummary.change >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.change))} Punkte ({trendSummary.percentage >= 0 ? "+" : "−"}{formatPercentage(Math.abs(trendSummary.percentage))} %)
+              {trendSummary.change >= 0 ? "+" : "−"}{formatRating(Math.abs(trendSummary.change))} {l({ de: "Punkte", en: "points" })} ({trendSummary.percentage >= 0 ? "+" : "−"}{formatPercentage(Math.abs(trendSummary.percentage))} %)
             </span>
           {/if}
         </div>
-        <nav class="rating-history__ranges" aria-label="Zeitraum auswählen">
+        <nav class="rating-history__ranges" aria-label={l({ de: "Zeitraum auswählen", en: "Select period" })}>
           {#each rangeOptions as option}
             <button type="button" class:rating-history__range--active={selectedRange === option.id} aria-pressed={selectedRange === option.id} on:click={() => selectRange(option.id)}>{option.label}</button>
           {/each}
@@ -193,7 +199,7 @@
       </div>
     {/if}
     <div class="rating-history__plot" use:measurePlot>
-      <svg viewBox={`0 0 ${renderWidth} ${chartHeight}`} role="img" aria-label={`Historischer Ratingverlauf von ${playerName}`}>
+      <svg viewBox={`0 0 ${renderWidth} ${chartHeight}`} role="img" aria-label={l({ de: `Historischer Ratingverlauf von ${playerName}`, en: `Rating history of ${playerName}` })}>
       {#each chart.yTicks as tick, index}
         <line class="rating-history__grid" x1={chartMargins.left} x2={renderWidth - chartMargins.right} y1={tick.y} y2={tick.y} />
         {#if !activePoint}
@@ -229,7 +235,7 @@
     </div>
   </div>
 {:else}
-  <p class="rating-modal__muted rating-history__empty">Keine historischen Ratingdaten vorhanden.</p>
+  <p class="rating-modal__muted rating-history__empty">{l({ de: "Keine historischen Ratingdaten vorhanden.", en: "No historical rating data available." })}</p>
 {/if}
 
 <style>

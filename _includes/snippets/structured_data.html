@@ -2,7 +2,7 @@
 {%- capture organization_id -%}{{ site.url }}/#organization{%- endcapture -%}
 {%- capture website_id -%}{{ site.url }}/#website{%- endcapture -%}
 {%- capture logo_url -%}{{ "/assets/images/logo.svg" | absolute_url }}{%- endcapture -%}
-{%- capture site_description -%}{{ site.description | strip_html | strip_newlines | strip }}{%- endcapture -%}
+{%- capture site_description -%}{{ 'site_description' | t: fallback: site.description | strip_html | strip_newlines | strip }}{%- endcapture -%}
 
 <script type="application/ld+json">
 {
@@ -24,7 +24,7 @@
       "url": {{ site.url | jsonify }},
       "name": {{ site.title | jsonify }},
       "description": {{ site_description | jsonify }},
-      "inLanguage": "de"
+      "inLanguage": {{ page.lang | default: site.languages[0] | jsonify }}
     }
     {%- if page.layout == "post" -%},
     {
@@ -38,7 +38,7 @@
       "description": {{ meta_description | jsonify }},
       "datePublished": {{ page.date | date_to_xmlschema | jsonify }},
       "dateModified": {{ page.last_modified_at | default: page.date | date_to_xmlschema | jsonify }},
-      "inLanguage": "de",
+      "inLanguage": {{ page.lang | default: site.languages[0] | jsonify }},
       "isPartOf": {
         "@id": {{ website_id | jsonify }}
       },
@@ -59,9 +59,9 @@
           {%- assign author = site.data.authors[page.author] -%}
           {
             "@type": "Person",
-            "@id": {{ author.url | absolute_url | append: "#person" | jsonify }},
+            "@id": {{ author.url | localize_url | absolute_url | append: "#person" | jsonify }},
             "name": {{ author.name | jsonify }},
-            "url": {{ author.url | absolute_url | jsonify }}
+            "url": {{ author.url | localize_url | absolute_url | jsonify }}
             {%- if author.image -%},
             "image": {{ author.image | absolute_url | jsonify }}
             {%- endif -%}
@@ -78,9 +78,9 @@
             {%- assign author = site.data.authors[author_id] -%}
             {
               "@type": "Person",
-              "@id": {{ author.url | absolute_url | append: "#person" | jsonify }},
+              "@id": {{ author.url | localize_url | absolute_url | append: "#person" | jsonify }},
               "name": {{ author.name | jsonify }},
-              "url": {{ author.url | absolute_url | jsonify }}
+              "url": {{ author.url | localize_url | absolute_url | jsonify }}
               {%- if author.image -%},
               "image": {{ author.image | absolute_url | jsonify }}
               {%- endif -%}
@@ -107,7 +107,8 @@
         "@id": {{ website_id | jsonify }}
       },
       "mainEntity": [
-        {%- for faq in site.data.faqs -%}
+        {%- assign faqs = 'faqs' | localized_data -%}
+        {%- for faq in faqs -%}
         {%- capture faq_answer_text -%}
           {{- faq.answer -}}
           {%- if faq.list -%} {{ faq.list | join: " " }}{%- endif -%}
@@ -124,13 +125,15 @@
       ]
     }
     {%- elsif page.layout == "author" -%}
-      {%- assign author = site.data.authors[page.author_id] -%},
+      {%- assign author = site.data.authors[page.author_id] -%}
+      {%- assign author_bio = author.bio -%}
+      {%- if page.lang != site.languages[0] and author.bio_en -%}{%- assign author_bio = author.bio_en -%}{%- endif -%},
     {
       "@type": "ProfilePage",
       "@id": {{ page_url | jsonify }},
       "url": {{ page_url | jsonify }},
       "name": {{ author.name | jsonify }},
-      "description": {{ author.bio | default: meta_description | jsonify }},
+      "description": {{ author_bio | default: meta_description | jsonify }},
       "isPartOf": {
         "@id": {{ website_id | jsonify }}
       },
@@ -149,8 +152,8 @@
       {%- if author.image -%},
       "image": {{ author.image | absolute_url | jsonify }}
       {%- endif -%}
-      {%- if author.bio -%},
-      "description": {{ author.bio | jsonify }}
+      {%- if author_bio -%},
+      "description": {{ author_bio | jsonify }}
       {%- endif -%}
       {%- if author.same_as -%},
       "sameAs": [
@@ -162,12 +165,12 @@
     }
     {%- else -%},
     {
-      "@type": "{%- if page.layout == "index" -%}CollectionPage{%- elsif page.url == "/about/" -%}AboutPage{%- elsif page.url == "/contact/" -%}ContactPage{%- else -%}WebPage{%- endif -%}",
+      "@type": "{%- if page.layout == "index" -%}CollectionPage{%- elsif page.url == "/about/" or page.url == "/en/about/" -%}AboutPage{%- elsif page.url == "/contact/" or page.url == "/en/contact/" -%}ContactPage{%- else -%}WebPage{%- endif -%}",
       "@id": {{ page_url | jsonify }},
       "url": {{ page_url | jsonify }},
       "name": {{ page.title | default: site.title | jsonify }},
       "description": {{ meta_description | jsonify }},
-      "inLanguage": "de",
+      "inLanguage": {{ page.lang | default: site.languages[0] | jsonify }},
       "isPartOf": {
         "@id": {{ website_id | jsonify }}
       }

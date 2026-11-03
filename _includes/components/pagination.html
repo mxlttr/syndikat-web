@@ -7,21 +7,21 @@
             <div class="pagination__list">
               {% if paginator.previous_page %}
                 <a href="{{ paginator.previous_page_path | relative_url }}" class="pagination__prev pagination__item">
-                  {% include snippets/lucide/icon.html name="arrow-left" class="lucide" %} Vorherige
+                  {% include snippets/lucide/icon.html name="arrow-left" class="lucide" %} {{ 'pagination.previous' | t }}
                 </a>
               {% else %}
                 <span class="pagination__prev pagination__item disabled">
-                  {% include snippets/lucide/icon.html name="arrow-left" class="lucide" %} Vorherige
+                  {% include snippets/lucide/icon.html name="arrow-left" class="lucide" %} {{ 'pagination.previous' | t }}
                 </span>
               {% endif %}
-              <div class="pagination__count pagination__item">Seite {{ paginator.page }} von {{ paginator.total_pages }}</div>
+              <div class="pagination__count pagination__item">{{ 'pagination.count' | t: page: paginator.page, total: paginator.total_pages }}</div>
               {% if paginator.next_page %}
                 <a href="{{ paginator.next_page_path | relative_url }}" class="pagination__next pagination__item">
-                  Nächste {% include snippets/lucide/icon.html name="arrow-right" class="lucide" %}
+                  {{ 'pagination.next' | t }} {% include snippets/lucide/icon.html name="arrow-right" class="lucide" %}
                 </a>
               {% else %}
                 <span class="pagination__next pagination__item disabled">
-                  Nächste {% include snippets/lucide/icon.html name="arrow-right" class="lucide" %}
+                  {{ 'pagination.next' | t }} {% include snippets/lucide/icon.html name="arrow-right" class="lucide" %}
                 </span>
               {% endif %}
             </div>

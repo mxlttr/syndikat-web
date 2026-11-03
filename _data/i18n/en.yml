@@ -1,0 +1,110 @@
+# UI strings for English pages. Keep keys in sync with de.yml.
+locale: en_GB
+date_format: "%-d %B %Y"
+months:
+  - January
+  - February
+  - March
+  - April
+  - May
+  - June
+  - July
+  - August
+  - September
+  - October
+  - November
+  - December
+
+site_description: >-
+  Discover Cologne's disc golf scene.
+  Join our Discord, take part in our weekly league and experience the fascination of this sport together with other enthusiasts!
+
+language:
+  name: English
+  switch_label: Read in English
+
+hero:
+  title: Hey, we are the Syndikat
+  discord: Join Discord
+  membership: Become a member
+  image_alt: Disc golf discs in a backpack
+
+pagination:
+  previous: Previous
+  next: Next
+  count: Page %{page} of %{total}
+
+search:
+  label: Search the website
+  placeholder: Search …
+
+tags:
+  view_all: View all
+  back_to_top: Back to top
+
+post:
+  co_author: Co-author
+  ai_translation_notice: This post was translated from German with the help of AI and may contain errors.
+  ai_translation_link: Read the original German version.
+
+author:
+  default_bio: Author at syndikat.golf and member of Disc Golf Syndikat Cologne.
+  posts_by: Posts by %{name}
+  page_title: "%{name} at Disc Golf Syndikat"
+
+contact:
+  name_label: Your name
+  name_placeholder: Name
+  email_label: Your email
+  email_placeholder: Email
+  message_label: Your message
+  message_placeholder: Message
+  submit: Send
+
+membership:
+  yearly: Yearly
+  monthly: Monthly
+  select: Select
+  register: Sign up
+  stripe_locale: en
+
+checklist:
+  summary: Expand the tournament packing checklist
+  reset: Reset list
+
+product_search:
+  supported_shops: Supported shops
+  missing_shop: Is a shop missing from the list, or do you have feedback on the tool?
+  contact_link: Write to us via the contact form
+  noscript: The live price comparison search requires JavaScript. The information on this page will still help you understand the tool and the supported shops.
+
+ratings:
+  noscript: Please enable JavaScript to view the ratings.
+
+bag_tags:
+  rank: Rank
+  name: Name
+
+dice_game:
+  intro: Press the button and let chance decide what your next throw looks like! The first die tells you the throw, the second one the type of disc. Have fun playing!
+  roll: Roll the dice
+
+tournaments:
+  route_eyebrow: Getting to the tournament
+  route_title: Calculate a driving route
+  route_copy: First select a tournament on the map, then enter a complete starting address. Street, house number, postcode and city work most reliably.
+  route_origin_label: Starting address
+  route_origin_placeholder: Street, house number, postcode, city
+  route_submit: Calculate route
+  route_initial_message: Select a tournament on the map to plan your route.
+  route_train: Search for train connections
+  overview_eyebrow: Official tournaments
+  overview_title: All upcoming tournaments
+  overview_copy: The list shows upcoming tournaments from turniere.discgolf.de, with date, location, status and current registrations.
+  loading: Loading tournaments …
+  col_status: Status
+  col_tournament: Tournament
+  col_date: Date
+  col_location: Location
+  col_spots: Spots
+  col_action: Action

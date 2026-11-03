@@ -1,0 +1,28 @@
+items:
+  - original_image: /assets/images/gallery/basket.jpg
+    image: /assets/images/gallery/basket_thumb.jpg
+    alt: Disc golf basket in Cologne
+  - original_image: /assets/images/gallery/hole-7.jpg
+    image: /assets/images/gallery/hole-7_thumb.jpg
+    alt: Hole 7 in Cologne
+  - original_image: /assets/images/gallery/scheibenstrasse.jpg
+    image: /assets/images/gallery/scheibenstrasse_thumb.jpg
+    alt: Street sign of Scheibenstraße
+  - original_image: /assets/images/gallery/walking-to-basket.jpg
+    image: /assets/images/gallery/walking-to-basket_thumb.jpg
+    alt: A group of disc golfers
+  - original_image: /assets/images/gallery/discs-in-basket.jpg
+    image: /assets/images/gallery/discs-in-basket_thumb.jpg
+    alt: Disc golf discs in a basket
+  - original_image: /assets/images/gallery/weidenpesch-classics.jpg
+    image: /assets/images/gallery/weidenpesch-classics_thumb.jpg
+    alt: Group of players at a tee pad
+  - original_image: /assets/images/gallery/crowd-watching.jpg
+    image: /assets/images/gallery/crowd-watching_thumb.jpg
+    alt: A person throwing a disc golf disc
+  - original_image: /assets/images/gallery/discraft-buzzz.jpg
+    image: /assets/images/gallery/discraft-buzzz_thumb.jpg
+    alt: Disc with the inscription 'Discraft'
+  - original_image: /assets/images/gallery/raptor-disc.jpg
+    image: /assets/images/gallery/raptor-disc_thumb.jpg
+    alt: Disc golf backpack with a disc

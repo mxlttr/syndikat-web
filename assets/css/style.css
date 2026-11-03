@@ -2859,6 +2859,32 @@ button.button--text {
   color: var(--brand-color)
 }
 
+.nav-button .nav__lang {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-decoration: none;
+  transition: color .25s ease
+}
+
+.nav-button .nav__lang:hover {
+  color: var(--brand-color)
+}
+
+.post__notice {
+  margin-bottom: 32px;
+  padding: 12px 20px;
+  border-left: 4px solid var(--brand-color);
+  border-radius: 4px;
+  font-size: 0.85em;
+  background: var(--background-alt-color)
+}
+
+.post__notice a {
+  text-decoration: underline
+}
+
 @media only screen and (max-width: 1024px) {
   .nav-button {
     margin-left: auto;

@@ -20,7 +20,8 @@ layout: default
       <p>{{ content }}</p>
 
       <ul class="faq-questions">
-        {% for faq in site.data.faqs %}
+        {% assign faqs = 'faqs' | localized_data %}
+        {% for faq in faqs %}
         <li>
           <details open>
             <summary>

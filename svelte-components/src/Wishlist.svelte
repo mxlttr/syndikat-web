@@ -1,5 +1,6 @@
 <script>
   import Icon from "./Icon.svelte";
+  import { l } from "./i18n.js";
 
   export let wishlist;
   const overlay = document.querySelector(".overlay");
@@ -23,7 +24,7 @@
 
 <button
   on:click={toggleAside}
-  aria-label="Wunschliste öffnen"
+  aria-label={l({ de: "Wunschliste öffnen", en: "Open wishlist" })}
   class="button button--primary wishlist"
 >
   <Icon name="heart" filled={true} />
@@ -32,14 +33,14 @@
 
 <aside data-wishlist aria-hidden={true}>
   <header class="search__group">
-    <h3>Wunschliste</h3>
+    <h3>{l({ de: "Wunschliste", en: "Wishlist" })}</h3>
     <button on:click={toggleAside} class="search__close">
       <Icon name="x" />
     </button>
   </header>
   <section>
     {#if $wishlist.length === 0}
-      <p>Deine Wunschliste ist leer.</p>
+      <p>{l({ de: "Deine Wunschliste ist leer.", en: "Your wishlist is empty." })}</p>
     {:else}
       <ul>
         {#each $wishlist as product}

@@ -3,7 +3,7 @@ const TRASH_ICON = '<svg class="lucide" xmlns="http://www.w3.org/2000/svg" width
 let trainingStatus;
 
 function formatDateGerman(date) {
-  return new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(`${date}T12:00:00Z`));
+  return new Intl.DateTimeFormat(PAGE_LOCALE, { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(`${date}T12:00:00Z`));
 }
 
 async function loadStatus() {
@@ -20,7 +20,7 @@ async function loadParticipants() {
   const response = await fetch(`${API_URL}/training/participants?date=${encodeURIComponent(trainingStatus.date)}`, { credentials: 'include' });
   if (!response.ok) return console.error('Failed to load training participants');
   const { participants } = await response.json();
-  if (!participants.length) return list.insertAdjacentHTML('afterbegin', '<p><em data-no-participants>Bisher noch keine Anmeldungen. Sei der/die erste!</em></p>');
+  if (!participants.length) return list.insertAdjacentHTML('afterbegin', `<p><em data-no-participants>${localize({ de: 'Bisher noch keine Anmeldungen. Sei der/die erste!', en: 'No sign-ups yet. Be the first!' })}</em></p>`);
   participants.forEach((participant) => {
     const signup = JSON.parse(window.localStorage.getItem('training-signup'));
     const listItem = document.createElement('li');
@@ -56,8 +56,8 @@ async function sendData(form) {
     body: JSON.stringify({ name: formData.get('name'), password: formData.get('password') }),
   });
   const result = await response.json();
-  if (!response.ok) return alert(result.message || 'Anmeldung fehlgeschlagen.');
-  alert('Du hast dich erfolgreich angemeldet.');
+  if (!response.ok) return alert(result.message || localize({ de: 'Anmeldung fehlgeschlagen.', en: 'Sign-up failed.' }));
+  alert(localize({ de: 'Du hast dich erfolgreich angemeldet.', en: 'You have signed up successfully.' }));
   form.reset();
   setRemovalToken(result.participant, result.removalToken);
   loadParticipants();
@@ -68,7 +68,7 @@ function initializeForm() {
   if (!form) return;
   if (!trainingStatus.signupOpen) {
     form.querySelector('button').disabled = true;
-    form.insertAdjacentHTML('beforebegin', '<p><em>Die Anmeldung für das nächste Training öffnet am Samstag.</em></p>');
+    form.insertAdjacentHTML('beforebegin', `<p><em>${localize({ de: 'Die Anmeldung für das nächste Training öffnet am Samstag.', en: 'Sign-up for the next training session opens on Saturday.' })}</em></p>`);
   }
   form.addEventListener('submit', (event) => { event.preventDefault(); if (trainingStatus.signupOpen) sendData(form); });
 }

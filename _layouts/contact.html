@@ -9,24 +9,24 @@ layout: page
         <p class="page-description">{{ page.description }}</p>
       </div>
     {% endif %}
-    <form class="form" id="contact-form" action="/success?ref={{ page.title | slugify }}" name="contact" method="POST" data-netlify="true" data-netlify-recaptcha="true">
+    <form class="form" id="contact-form" action="{{ '/success' | localize_url }}?ref={{ page.title | slugify }}" name="contact" method="POST" data-netlify="true" data-netlify-recaptcha="true">
       <div class="form__group">
-        <label class="form__label screen-reader-text" for="form-name">Dein Name</label>
-        <input class="form__input" id="form-name" type="text" name="name" placeholder="Name" required>
+        <label class="form__label screen-reader-text" for="form-name">{{ 'contact.name_label' | t }}</label>
+        <input class="form__input" id="form-name" type="text" name="name" placeholder="{{ 'contact.name_placeholder' | t }}" required>
       </div>
       <div class="form__group">
-        <label class="form__label screen-reader-text" for="form-email">Deine Email</label>
-        <input class="form__input" id="form-email" type="email" name="_replyto" placeholder="Email" required>
+        <label class="form__label screen-reader-text" for="form-email">{{ 'contact.email_label' | t }}</label>
+        <input class="form__input" id="form-email" type="email" name="_replyto" placeholder="{{ 'contact.email_placeholder' | t }}" required>
       </div>
       <div class="form__group">
-        <label class="form__label screen-reader-text" for="form-text">Deine Nachricht</label>
-        <textarea class="form__input" id="form-text" name="text" rows="10" placeholder="Nachricht" required></textarea>
+        <label class="form__label screen-reader-text" for="form-text">{{ 'contact.message_label' | t }}</label>
+        <textarea class="form__input" id="form-text" name="text" rows="10" placeholder="{{ 'contact.message_placeholder' | t }}" required></textarea>
       </div>
 
       <div data-netlify-recaptcha="true"></div>
 
       <div class="form__group">
-        <button class="button button--primary" type="submit">Abschicken</button>
+        <button class="button button--primary" type="submit">{{ 'contact.submit' | t }}</button>
       </div>
     </form>
   </div>

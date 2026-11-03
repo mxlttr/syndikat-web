@@ -41,22 +41,16 @@ layout: default
 
               <div class="post__meta-bottom">
                 {% if author.url %}
-                  <a href="{{ author.url }}" rel="author" class="post__author">{{- author.name -}}</a>
+                  <a href="{{ author.url | localize_url }}" rel="author" class="post__author">{{- author.name -}}</a>
                 {% elsif author.twitter %}
                   <a href="//twitter.com/{{- author.twitter -}}" rel="author" class="post__author">{{- author.name -}}</a>
                 {% else %}
                   <span class="post__author author">{{- author.name -}}</span>
                 {% endif %}
                 {% if forloop.first %}
-                  {% capture i18n_date %}
-                    {{ page.date | date: "%-d" | append: "." }}
-                    {% assign m = page.date | date: "%-m" | minus: 1 %}
-                    {{ site.data.de.months[m] }}
-                    {{ page.date | date: "%Y" }}
-                  {% endcapture %}
-                  <time class="post__date" datetime="{{- page.date -}}">{{- i18n_date -}}</time>
+                  <time class="post__date" datetime="{{- page.date -}}">{{- page.date | localize_date -}}</time>
                 {% else %}
-                  <span class="post__date">Co-Autor</span>
+                  <span class="post__date">{{ 'post.co_author' | t }}</span>
                 {% endif %}
               </div>
             {% endfor %}
@@ -69,6 +63,14 @@ layout: default
 
 <div class="container animate">
   <article class="post">
+    {%- if page.ai_translated %}
+    <aside class="post__notice" role="note">
+      {{ 'post.ai_translation_notice' | t }}
+      {%- assign default_lang = site.languages | first -%}
+      {%- assign original_url = page.translations[default_lang] -%}
+      {%- if original_url %} <a href="{{ original_url }}" lang="{{ site.languages[0] }}" hreflang="{{ site.languages[0] }}">{{ 'post.ai_translation_link' | t }}</a>{% endif %}
+    </aside>
+    {%- endif %}
     <div class="post__content">{{ content }}</div>
     {% include components/post_share.html %}
   </article>

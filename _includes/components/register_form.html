@@ -1,5 +1,6 @@
-<form class="form" id="register-form" action="/success?ref={{ page.title | slugify }}" name="signup" method="POST" data-netlify="true" data-netlify-recaptcha="true">
-  {% for field in site.data.register_fields %}
+<form class="form" id="register-form" action="{{ '/success' | localize_url }}?ref={{ page.title | slugify }}" name="signup" method="POST" data-netlify="true" data-netlify-recaptcha="true">
+  {% assign register_fields = 'register_fields' | localized_data %}
+  {% for field in register_fields %}
   <div class="form__group form__group--{{ field.type }}{% if field.required %} form__group--required{% endif %}">
 
     {% if field.type == 'radio' %}
@@ -48,6 +49,6 @@
   </div>
 
   <div class="form__group">
-    <button class="button button--big button--primary" type="submit">Anmelden</button>
+    <button class="button button--big button--primary" type="submit">{{ 'membership.register' | t }}</button>
   </div>
 </form>

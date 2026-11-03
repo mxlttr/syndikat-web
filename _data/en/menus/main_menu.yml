@@ -1,0 +1,15 @@
+# Links are localized automatically (/about/ -> /en/about/).
+title: Menu
+items:
+  - label: About us
+    link: /about/
+  - label: Price comparison
+    link: /preisvergleich/
+  - label: Tournaments
+    link: /turniere/
+  - label: Events
+    link: /events/
+  - label: Tools
+    link: /tools/
+  - label: Become a member
+    link: /register/
