@@ -4,6 +4,14 @@ description: Infos zur wöchentlichen Liga und zu weiteren Disc Golf Events des 
 layout: page
 ---
 
+## Glow Disc Golf Cologne
+
+![Glow Disc Golf Cologne — 5 December 2026 at 18:00](/assets/images/glow-disc-golf-cologne.jpg)
+
+Lust auf Disc Golf nach Sonnenuntergang? Beim **Glow Disc Golf Cologne** spielen wir am **Samstag, 5. Dezember 2026, ab 18 Uhr** eine entspannte Runde bei Dunkelheit mit leuchtenden Scheiben. Bring gern deine leuchtenden Scheiben und warme Kleidung mit. Du bist neu dabei? Kein Problem: Das Event ist locker und offen für alle Spielstärken.
+
+Details zu Treffpunkt, Anmeldung und möglichen Änderungen teilen wir vorab in [unserem Discord](https://community.syndikat.golf).
+
 ## Syndication Weekly
 
 Unsere wöchentliche Liga. Spieler:innen jedes Niveaus sind willkommen. Eine gewertete Runde, danach freies Spielen bis die Sonne unter geht.
