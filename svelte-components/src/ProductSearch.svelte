@@ -228,7 +228,7 @@
     return label;
   }
 
-  onMount(async () => {
+  onMount(() => {
     unsubscribeQuerystring = querystring.subscribe((value) => {
       const nextQuery = new URLSearchParams(value).get("q") || "";
       if (nextQuery.trim().toLowerCase() === searchedQuery) return;
@@ -237,24 +237,33 @@
       getProducts();
     });
 
-    const newest = (await fetchNewestProducts()).slice(0, 6);
-    newProducts.set(newest);
+    fetchNewestProducts().then((newest) => newProducts.set(newest.slice(0, 6)));
 
     // discs are pulled from https://discit-api.fly.dev/disc
-    discs = await fetch("/assets/discs.json").then((res) => res.json());
-
-    new Awesomplete(searchInputElement, {
-      list: discs.map((disc) => ({
-        label: getDiscLabel(disc),
-        value: `${disc.name}`,
-      })),
-      filter: (suggestion, input) =>
-        Awesomplete.FILTER_CONTAINS(suggestion.value, input),
-      minChars: 3,
-      maxItems: 20,
-      autoFirst: false,
-      tabSelect: true,
-    });
+    fetch("/assets/discs.json")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load disc suggestions: ${res.status}`);
+        return res.json();
+      })
+      .then((loadedDiscs) => {
+        if (!Array.isArray(loadedDiscs)) throw new Error("Invalid disc suggestions data");
+        discs = loadedDiscs;
+        new Awesomplete(searchInputElement, {
+          list: discs.map((disc) => ({
+            label: getDiscLabel(disc),
+            value: `${disc.name}`,
+          })),
+          filter: (suggestion, input) =>
+            Awesomplete.FILTER_CONTAINS(suggestion.value, input),
+          minChars: 3,
+          maxItems: 20,
+          autoFirst: false,
+          tabSelect: true,
+        });
+      })
+      .catch((err) => {
+        console.warn("Disc suggestions unavailable.", err);
+      });
 
     focusSearchInput();
   });

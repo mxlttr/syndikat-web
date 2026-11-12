@@ -46,6 +46,11 @@ Browser code currently chooses `http://localhost:8080` for `localhost`/`127.0.0.
 - product feed and product-search SSE stream;
 - training status, participant listing, signup, and removal.
 
+The product feed may serve the last complete Shopify result during a temporary store
+failure. If every store fails and no prior complete result is available, the API
+returns HTTP 503; the browser omits the new-products section and leaves product
+search available.
+
 Browser error reporting uses the Sentry Browser SDK. Set the public Sentry `SENTRY_DSN`
 environment variable in the Netlify build settings to enable it; `SENTRY_ENVIRONMENT`
 can override the build context used to label events. The DSN is included in the public

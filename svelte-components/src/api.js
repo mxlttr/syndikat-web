@@ -68,10 +68,6 @@ export async function fetchNewestProducts() {
   try {
     const response = await fetch(`${API_URL}/products/feed`, {
       credentials: 'include',
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
     });
     if (!response.ok) {
       console.error(`Fetch error: ${response.status} ${response.statusText}`);
