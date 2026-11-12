@@ -1,0 +1,122 @@
+---
+import { plans } from "../data/plans.ts";
+import { Info } from "@lucide/astro";
+import "tippy.js/dist/tippy.css";
+
+const checkoutUrl = (href: string) => {
+  const url = new URL(href);
+  url.searchParams.set("locale", "de");
+  return url.toString();
+};
+---
+
+<script>
+  import tippy from "tippy.js";
+
+  tippy(".tooltip", {
+    theme: "syndikat",
+    placement: "top",
+    allowHTML: true,
+    offset: [0, -4],
+  });
+
+  document.querySelectorAll<HTMLElement>("[data-plan-picker]").forEach((root) => {
+    const periodButtons = root.querySelectorAll<HTMLButtonElement>("[data-period]");
+    const planPeriods = root.querySelectorAll<HTMLElement>("[data-period-item]");
+    const planCards = root.querySelectorAll<HTMLElement>("[data-plan-card]");
+
+    periodButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const selectedPeriod = button.dataset.period;
+        if (!selectedPeriod) return;
+
+        periodButtons.forEach((candidate) => {
+          const isSelected = candidate === button;
+          candidate.classList.toggle("button--primary", isSelected);
+          candidate.setAttribute("aria-pressed", String(isSelected));
+        });
+
+        planCards.forEach((card) => card.classList.remove("plan-card--featured"));
+
+        planPeriods.forEach((periodElement) => {
+          const isActive = periodElement.dataset.periodItem === selectedPeriod;
+          periodElement.hidden = !isActive;
+
+          if (isActive && periodElement.dataset.featured === "true") {
+            periodElement.closest("[data-plan-card]")?.classList.add("plan-card--featured");
+          }
+        });
+      });
+    });
+  });
+</script>
+
+<div data-plan-picker>
+  <div class="period-select">
+    <div class="period-select__button-group" role="group" aria-label="Abrechnungszeitraum">
+      <button type="button" class="button button--primary" data-period="yearly" aria-pressed="true">
+        Jährlich
+      </button>
+      <button type="button" class="button" data-period="monthly" aria-pressed="false">
+        Monatlich
+      </button>
+    </div>
+  </div>
+
+  <div class="plan-list">
+    {plans.map((plan) => (
+      <div data-plan-card class={`plan-card${plan.periods[0].featured ? " plan-card--featured" : ""}`}>
+        <div class="plan-card__header">
+          <h3 class="plan-card__title">{plan.title}</h3>
+          {plan.tooltip && (
+            <span class="tooltip" data-tippy-content={plan.tooltip}>
+              <Info />
+            </span>
+          )}
+          <p class="plan-card__description">{plan.description}</p>
+        </div>
+
+        <div class="plan-card__content">
+          <div class="plan-card__periods">
+            {plan.periods.map((period) => (
+              <div
+                class="plan-card__periods-item"
+                data-featured={period.featured ? "true" : "false"}
+                data-period-item={period.name}
+                hidden={period.name !== plan.periods[0].name}
+              >
+                <p class="plan-card__price">
+                  {period.price ? (
+                    <>
+                      <span class="plan-card__price-amount">{period.price}</span>
+                      <span class="plan-card__price-currency"> €</span>
+                    </>
+                  ) : (
+                    <span class="plan-card__price-currency">&mdash;</span>
+                  )}
+                </p>
+
+                <div class="plan-card__cta">
+                  {period.link ? (
+                    <a
+                      href={checkoutUrl(period.link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class={`button${period.featured ? " button--primary" : ""}`}
+                    >
+                      Auswählen
+                    </a>
+                  ) : (
+                    <button type="button" class={`button${period.featured ? " button--primary" : ""}`} disabled>
+                      Auswählen
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

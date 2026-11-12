@@ -1,0 +1,89 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import DefaultLayout from "../../layouts/default.astro";
+import PostsList from "../../components/PostsList.astro";
+import { getPostDate } from "../../utils/posts";
+
+export async function getStaticPaths() {
+  const [authors, allPosts] = await Promise.all([getCollection("authors"), getCollection("blog")]);
+
+  return authors.map((author) => ({
+    params: { author: author.id },
+    props: {
+      author,
+      posts: allPosts
+        .filter((post) => post.data.author === author.id || post.data.authors.includes(author.id))
+        .sort((a, b) => (getPostDate(b)?.getTime() ?? 0) - (getPostDate(a)?.getTime() ?? 0)),
+    },
+  }));
+}
+
+const { author, posts } = Astro.props;
+const title = `${author.data.name} beim Disc Golf Syndikat`;
+const description = author.data.bio ?? "Autor bei syndikat.golf und Mitglied des Disc Golf Syndikat Koeln.";
+---
+
+<DefaultLayout
+  title={title}
+  description={description}
+  pageType="profile"
+  author={{
+    name: author.data.name,
+    url: author.data.url,
+    image: author.data.image?.src,
+    twitter: author.data.twitter,
+    same_as: author.data.same_as,
+  }}
+>
+  <div class="page-head">
+    <div class="container">
+      <div class="row">
+        <div class="col col-12">
+          <div class="page__info">
+            <h1 class="page__title">{author.data.name}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container animate">
+    <article class="page">
+      <div class="page__content">
+        {author.data.image && (
+          <p>
+            <Image src={author.data.image} alt={author.data.name} width={160} height={160} />
+          </p>
+        )}
+        <p>{description}</p>
+        {author.data.same_as.length > 0 && (
+          <ul>
+            {author.data.same_as.map((url) => (
+              <li>
+                <a href={url} rel="me noopener noreferrer">
+                  {url}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </article>
+  </div>
+
+  {posts.length > 0 && (
+    <>
+      <div class="container">
+        <div class="row animate">
+          <div class="col col-12">
+            <div class="section__head">
+              <h2 class="section__title">Artikel von {author.data.name}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <PostsList posts={posts} />
+    </>
+  )}
+</DefaultLayout>

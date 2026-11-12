@@ -1,0 +1,35 @@
+---
+import type { Page } from "astro";
+import { ArrowLeft, ArrowRight } from "@lucide/astro";
+import PaginationItem from "./PaginationItem.astro";
+
+interface Props {
+  page: Page<unknown>;
+}
+
+const { page } = Astro.props;
+---
+
+<div class="container">
+  <div class="row">
+    <div class="col col-12">
+      <nav class="pagination animate" aria-label="Seitennavigation">
+        <div class="pagination__inner">
+          <div class="pagination__list">
+            <PaginationItem href={page.url.prev} class="pagination__prev pagination__item">
+              <ArrowLeft /> Vorherige
+            </PaginationItem>
+
+            <div class="pagination__count pagination__item">
+              Seite {page.currentPage} von {page.lastPage}
+            </div>
+
+            <PaginationItem href={page.url.next} class="pagination__next pagination__item">
+              Nächste <ArrowRight />
+            </PaginationItem>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>

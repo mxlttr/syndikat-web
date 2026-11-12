@@ -1,0 +1,123 @@
+---
+const dsn = import.meta.env.PROD ? import.meta.env.SENTRY_DSN || "" : "";
+const environment = import.meta.env.SENTRY_ENVIRONMENT || import.meta.env.MODE;
+const config = JSON.stringify({ dsn, environment }).replace(/</g, "\\u003c");
+---
+
+<script type="application/json" id="sentry-config" set:html={config} />
+<script>
+  const configElement = document.getElementById("sentry-config");
+  const config = configElement?.textContent
+    ? (JSON.parse(configElement.textContent) as { dsn?: string; environment?: string })
+    : {};
+
+  const pendingErrors: Error[] = [];
+  // eslint-disable-next-line no-unused-vars -- This is a TypeScript function signature.
+  let reportError: ((...args: [Error]) => void) | undefined;
+
+  window.Sentry = {
+    captureException(error) {
+      if (!(error instanceof Error) || error.name === "AbortError") return;
+      const status = (error as Error & { status?: unknown }).status;
+      if (typeof status === "number" && status < 500) return;
+
+      if (reportError) reportError(error);
+      else if (config.dsn && pendingErrors.length < 20) pendingErrors.push(error);
+    },
+  };
+
+  if (config.dsn) {
+    void import("../utils/sentry-client")
+      .then(({ startSentry }) => {
+        reportError = startSentry({
+          dsn: config.dsn,
+          environment: config.environment,
+          sendDefaultPii: false,
+          initialScope: {
+            tags: { service: "frontend" },
+          },
+          beforeSend(event) {
+            if (event.request) {
+              delete event.request.data;
+              delete event.request.cookies;
+              delete event.request.headers;
+              delete event.request.query_string;
+              delete event.request.fragment;
+              if (event.request.url) event.request.url = stripQueryString(event.request.url);
+            }
+
+            if (event.breadcrumbs) {
+              event.breadcrumbs = event.breadcrumbs
+                .map(sanitizeBreadcrumb)
+                .filter((breadcrumb): breadcrumb is NonNullable<typeof breadcrumb> => breadcrumb !== null);
+            }
+
+            delete event.extra;
+            return event;
+          },
+          beforeBreadcrumb(breadcrumb) {
+            if (!["fetch", "xhr", "navigation"].includes(breadcrumb.category ?? "")) return null;
+            return sanitizeBreadcrumb(breadcrumb);
+          },
+        });
+
+        for (const error of pendingErrors.splice(0)) reportError(error);
+      })
+      .catch(() => {
+        pendingErrors.length = 0;
+      });
+  }
+
+  function stripQueryString(value: string) {
+    try {
+      const url = new URL(value, window.location.origin);
+      const pathname = redactSearchPath(url.pathname);
+      return value.startsWith("/") ? pathname : `${url.origin}${pathname}`;
+    } catch {
+      return redactSearchPath(value.split(/[?#]/, 1)[0]);
+    }
+  }
+
+  function redactSearchPath(pathname: string) {
+    const segments = pathname.split("/");
+    const searchIndex = segments.findIndex((segment) => /^(search|search-stream)$/i.test(segment));
+    if (searchIndex >= 0 && searchIndex < segments.length - 1) {
+      return `${segments.slice(0, searchIndex + 1).join("/")}/[query]`;
+    }
+
+    const productsIndex = segments.findIndex((segment) => segment.toLowerCase() === "products");
+    if (productsIndex >= 0 && productsIndex < segments.length - 2) {
+      segments[productsIndex + 2] = "[query]";
+      return segments.slice(0, productsIndex + 3).join("/");
+    }
+
+    return pathname;
+  }
+
+  function sanitizeBreadcrumb(breadcrumb: { category?: string; data?: Record<string, unknown>; message?: string }) {
+    const category = breadcrumb.category;
+    const data = breadcrumb.data ?? {};
+
+    if (category === "fetch" || category === "xhr") {
+      const safeData: Record<string, string | number> = {};
+      for (const key of ["url", "method", "status_code"] as const) {
+        const value = data[key];
+        if (typeof value === "string" || typeof value === "number") {
+          safeData[key] = key === "url" ? stripQueryString(String(value)) : value;
+        }
+      }
+      return { ...breadcrumb, message: undefined, data: safeData };
+    }
+
+    if (category === "navigation") {
+      const safeData: Record<string, string> = {};
+      for (const key of ["from", "to"] as const) {
+        const value = data[key];
+        if (typeof value === "string") safeData[key] = stripQueryString(value);
+      }
+      return { ...breadcrumb, message: undefined, data: safeData };
+    }
+
+    return null;
+  }
+</script>

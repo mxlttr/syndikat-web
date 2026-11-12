@@ -1,0 +1,61 @@
+---
+import DefaultLayout from "../layouts/default.astro";
+import ShopLogos from "../components/ShopLogos.svelte";
+import ProductSearch from "../components/ProductSearch.svelte";
+import { shops } from "../data/shops";
+import type { ImageMetadata } from "astro";
+
+const { frontmatter } = Astro.props;
+const images = import.meta.glob<ImageMetadata>("/src/assets/**/*.{png,jpg,jpeg,webp,avif}", {
+  eager: true,
+  import: "default",
+});
+const image = images[`/src/assets/images/${frontmatter.image}`];
+---
+
+<DefaultLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  image={image?.src}
+  imageAlt={frontmatter.title}
+>
+  <div class="page-head">
+    <div class="container">
+      <div class="row">
+        <div class="col col-12">
+          <div class="page__info">
+            <h1 class="page__title">{frontmatter.title}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container page page-full-width">
+    <div class="row">
+      <div class="col col-12">
+        <slot />
+
+        <ProductSearch shops={shops} client:load />
+
+        <h2>Unterstützte Shops</h2>
+
+        <ShopLogos shops={shops} />
+
+        <p>
+          Ein Shop fehlt noch in der Liste oder du hast Feedback zum Tool?{" "}
+          <a href="/contact/">Schreib uns über das Kontaktformular</a>.
+        </p>
+
+        <noscript>
+          <p>
+            Für die Live-Suche im Preisvergleich muss JavaScript aktiviert sein. Die Informationen auf dieser Seite
+            helfen dir trotzdem dabei, das Tool und die unterstützten Shops einzuordnen.
+          </p>
+        </noscript>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hide"></div>
+</DefaultLayout>

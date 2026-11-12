@@ -1,0 +1,32 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { tools } from "../data/menus.ts";
+
+const images = import.meta.glob<ImageMetadata>("/src/assets/images/**/*.{png,jpg,jpeg,webp,avif}", {
+  eager: true,
+  import: "default",
+});
+---
+
+<div class="container">
+  <div class="row animate">
+    {tools.reverse().map((item) => (
+      <div class="article col col-4 col-d-6 col-t-12">
+        <div class="article__inner">
+          <div class="article__head">
+            <a href={item.url} class="article__image">
+              <Image src={images[`/src/assets/images/${item.thumbnail}`]} alt={item.title} width={600} height={400} />
+            </a>
+          </div>
+          <div class="article__content">
+            <h2 class="article__title">
+              <a href={item.url}>{item.title}</a>
+            </h2>
+            {item.description && <p class="article__excerpt">{item.description}</p>}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

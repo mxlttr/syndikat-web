@@ -1,33 +1,32 @@
 # syndikat-web
 
-The Jekyll-based public website for Syndikat Disc Golf Cologne. It combines Markdown content and Liquid layouts with small browser JavaScript tools and a Svelte product-search bundle.
+The Astro-based public website for Syndikat Disc Golf Cologne. It combines Markdown and MDX content with interactive product search, ratings, bag tags, training signup, and tournament tools.
 
 ## Architecture
 
-The ratings page requests `/ratings` for all clubs. Club-specific consumers can request `/ratings/${encodeURIComponent(club)}`, for example `/ratings/disc%20golf%20syndikat`. The filter matches club-name substrings case-insensitively and treats Disc Golf and DG spellings equivalently. Paginated requests accept comma-separated club alternatives, such as `club=Köln,Syndikat`; response fields and original rankings are unchanged.
+The ratings page requests paginated `/ratings` data. Optional `club`, `division`, and `search` query parameters filter results; `club` accepts comma-separated alternatives. Player details load from `/players/{id}`.
 
-Jekyll renders pages, posts, layouts, includes, and `_data` into the static site. JavaScript powers interactive pages such as ratings, bag tags, training signups, and the tournament map. Svelte is reserved for the product search. See [architecture](docs/architecture.md) and [development](docs/development.md).
+Astro renders pages from `src/pages/` and blog posts from `src/content/blog/` into a static site. Shared layouts, components, and data live in `src/layouts/`, `src/components/`, and `src/data/`. Svelte powers interactive features. See [development](docs/development.md) for content conventions and API configuration.
 
 ## Prerequisites
 
-- Node.js 22.18 or newer and npm
-- Ruby and Bundler (versions locked by `Gemfile.lock`)
+- Node.js 22.22 or newer and npm
 
 ## Setup and commands
 
 ```sh
-npm install
-bundle install
-npm run dev
+npm ci
+npx astro dev --background
 ```
 
-`npm run dev` starts Jekyll and the Svelte development build. For a production-equivalent build:
+Use `npx astro dev status`, `npx astro dev logs`, and `npx astro dev stop` to manage the background development server. For a production build and source checks:
 
 ```sh
-npm run build:assets
 npm run build
+npm run lint
+npm run format:check
 ```
 
-The full build runs Svelte and CSS asset builds, Jekyll production rendering, and critical-CSS generation. Netlify runs `npm run build` and publishes `_site`.
+Netlify runs `npm run build` and publishes `dist/`.
 
 When changing a website API call, coordinate the implementation and [API contract](https://github.com/mxlttr/syndikat-api/blob/master/docs/openapi.yaml) in `mxlttr/syndikat-api`.

@@ -2,28 +2,25 @@
 
 ## Setup
 
-Use Node.js 22.18 or newer (the critical-CSS generator requires it), then install the Node and Ruby dependencies:
+Use Node.js 22.22 or newer, then install the dependencies:
 
 ```sh
-npm install
-bundle install
+npm ci
 ```
 
-Start both development processes with `npm run dev`. Use `npm run dev:jekyll` or `npm run dev:svelte` when working on only one side.
+Start the Astro development server with `npx astro dev --background`. Use `npx astro dev status`, `npx astro dev logs`, and `npx astro dev stop` to manage it.
 
 ## Build pipeline
 
-- `npm run build:svelte` delegates to `svelte-components/` and bundles the product-search UI.
-- `npm run build:css` minifies CSS.
-- `npm run build:assets` runs both asset tasks in parallel.
-- `npm run build:jekyll` renders the production static site.
-- `npm run build` runs assets, Jekyll, and critical-CSS generation in sequence. This is Netlify's build command.
+- `npm run build` renders the production Astro site.
+- `npm run lint` checks source files with ESLint.
+- `npm run format:check` checks formatting with Prettier.
 
 ## Content authoring
 
-Create regular pages as root-level Markdown files with front matter and posts as dated files in `_posts/`. Reuse an existing layout where possible. Put repeatable structured content in `_data/` and shared markup in `_includes/`; avoid embedding credentials or environment-specific API values in content.
+Create pages under `src/pages/` and blog posts under `src/content/blog/`. Reuse an existing layout where possible. Put repeatable structured content in `src/data/` and shared markup in `src/components/`; avoid embedding credentials or environment-specific API values in content.
 
-Images and other static files belong under `assets/`. Check responsive image and image-CDN behavior before adding very large assets. Editing `_config.yml` requires restarting Jekyll because it is not reloaded by `jekyll serve`.
+Processed images belong under `src/assets/`; unchanged public files belong under `public/`. Check responsive image behavior before adding very large assets.
 
 ### Campaign links
 
@@ -39,7 +36,7 @@ For Readybot's automatic blog posts, use the dedicated `/discord-feed.xml` feed.
 
 ## API configuration
 
-Browser code currently chooses `http://localhost:8080` for `localhost`/`127.0.0.1` and `https://api.syndikat.golf` otherwise. The Svelte build additionally accepts `API_URL` at build time. The consumed features are:
+Browser code chooses `http://localhost:8080` for `localhost`/`127.0.0.1` and `https://api.syndikat.golf` otherwise. Set `PUBLIC_API_URL` at build time to override this. The consumed features are:
 
 - bag-tag rankings and ratings;
 - official and Metrix tournament lists plus route planning;
@@ -51,12 +48,10 @@ failure. If every store fails and no prior complete result is available, the API
 returns HTTP 503; the browser omits the new-products section and leaves product
 search available.
 
-Browser error reporting uses the Sentry Browser SDK. Set the public Sentry `SENTRY_DSN`
-environment variable in the Netlify build settings to enable it; `SENTRY_ENVIRONMENT`
-can override the build context used to label events. The DSN is included in the public
-bundle and is not a secret. Query strings, request bodies, cookies, headers, UI input,
-and console breadcrumbs are removed before events are sent. Production source maps are
-published with the bundles so Sentry can display original source locations.
+Browser error reporting uses the Sentry Browser SDK. Set `SENTRY_DSN` in the
+Netlify build settings to enable it; `SENTRY_ENVIRONMENT` can label events. The DSN is included in the public bundle and
+is not a secret. Query strings, request bodies, cookies, headers, UI input, and
+console breadcrumbs are removed before events are sent.
 
 Read the API schemas in [mxlttr/syndikat-api](https://github.com/mxlttr/syndikat-api/blob/master/docs/openapi.yaml) before changing a request or response assumption.
 
