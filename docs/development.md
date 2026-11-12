@@ -43,10 +43,12 @@ Browser code chooses `http://localhost:8080` for `localhost`/`127.0.0.1` and `ht
 - product feed and product-search SSE stream;
 - training status, participant listing, signup, and removal.
 
-The product feed may serve the last complete Shopify result during a temporary store
-failure. If every store fails and no prior complete result is available, the API
-returns HTTP 503; the browser omits the new-products section and leaves product
-search available.
+The product feed caches complete Shopify results, including an empty list, for the
+API's configured cache lifetime (8 hours with `CACHE_EXPIRY=28800`). Failed refreshes
+back off from 15 minutes up to 8 hours and may serve the last complete result.
+If every store fails and no prior complete result is available, the API returns
+HTTP 503; the browser omits the new-products section and leaves product search
+available.
 
 Browser error reporting uses the Sentry Browser SDK. Set `SENTRY_DSN` in the
 Netlify build settings to enable it; `SENTRY_ENVIRONMENT` can label events. The DSN is included in the public bundle and
