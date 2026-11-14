@@ -58,7 +58,7 @@
   }
 
   function getTournamentInitials(value = "") {
-    const words = String(value).trim().split(/\s+/).filter(Boolean).slice(0, 2);
+    const words = String(value).trim().split(/[\s-]+/).filter(Boolean).slice(0, 2);
 
     if (!words.length) return "TT";
     return words.map((word) => word.charAt(0).toUpperCase()).join("");
