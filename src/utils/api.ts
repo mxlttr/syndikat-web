@@ -92,10 +92,16 @@ export function streamProducts(query: string, callbacks: ProductStreamCallbacks 
 }
 
 export async function fetchNewestProducts() {
+  let response: Response;
   try {
-    const response = await fetch(`${API_URL}/products/feed`, {
+    response = await fetch(`${API_URL}/products/feed`, {
       credentials: "include",
     });
+  } catch (err) {
+    console.warn("Product feed is unavailable.", err);
+    return [];
+  }
+  try {
     if (!response.ok) {
       console.error(`Fetch error: ${response.status} ${response.statusText}`);
       return [];
@@ -103,7 +109,7 @@ export async function fetchNewestProducts() {
     return await response.json();
   } catch (err) {
     window.Sentry?.captureException(err);
-    console.error("Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource.", err);
+    console.error("Failed to read product feed.", err);
     return [];
   }
 }
